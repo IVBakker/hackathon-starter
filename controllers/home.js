@@ -7,3 +7,15 @@ exports.index = (req, res) => {
     title: 'Home'
   });
 };
+
+exports.pre_index = (req, res) => {
+  res.render('countdown', {
+    title: 'Home'
+  });
+};
+
+exports.rules = (req, res) => {
+  res.render('rules', {
+    title: 'Rules'
+  });
+};
