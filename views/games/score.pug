@@ -1,0 +1,15 @@
+h1 Score
+include countdown
+.row
+	table.table.table-condensed
+		thead
+			tr
+				th Email
+				th User
+				th Score
+		tbody
+				each user in engine.getScore()
+						tr
+							td= user.email
+							td= user.user
+							td= user.score

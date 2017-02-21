@@ -1,27 +1,17 @@
 extends layout
 
 block content
-  h1 Rules
-  p.lead A boilerplate for Node.js web applications.
-  hr
-  .row
-    .col-sm-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
-    .col-sm-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
-    .col-sm-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
-    .col-sm-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
+	h1 Rules
+	dl.dl-horizontal
+		dt What?
+		dd Be the one with the most points at the end of the week
+		dt How?
+		dd Win mini-games. Mini-games take up to 5min to play (productivity is my concern). Each mini game gives 10 points for the first place then 9 points and etc... for a minimum of 1 point
+		dt When?
+		dd Every day you will be challenged to complete 2 games. One at 12:00 and one at 17:00 (sharp)
+		dt Who?
+		dd The rule of the mini-game will be visible one hour before the start of the mini-game. Games are based on agility or strength or intelligence. No general knowledge required
+		dt Where?
+		dd You need to be on the #[a(href="/competition") competition page] at 12:00 and 17:00. The mini-game will automatically load. You can't arrive late. Reloading during the game will kick you out of the game. Make sure to accept notifications to be alerted before a game starts. To accept notifications click #[a.notification_request(style="cursor:pointer") HERE]
+		dt Which?
+		dd Once again don't try to cheat. I have an admin interface this time.

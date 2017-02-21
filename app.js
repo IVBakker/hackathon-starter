@@ -31,7 +31,6 @@ dotenv.load({ path: '.env.example' });
  * Controllers (route handlers).
  */
 const homeController = require('./controllers/home');
-const adminController = require('./controllers/admin');
 const userController = require('./controllers/user');
 //const apiController = require('./controllers/api');
 const contactController = require('./controllers/contact');
@@ -40,13 +39,6 @@ const contactController = require('./controllers/contact');
  * API keys and Passport configuration.
  */
 const passportConfig = require('./config/passport');
-
-/**
- * Create Express server.
- */
-const app = express();
-var server = require('http').createServer(app); 
-const socketIo = require('socket.io')(server);
 
 /**
  * Connect to MongoDB.
@@ -62,8 +54,18 @@ var sessionStore = new MongoStore({
     url: process.env.MONGODB_URI || process.env.MONGOLAB_URI,
     autoReconnect: true
   });
+/**
+ * Create Express server.
+ */
+const app = express();
+var server = require('http').createServer(app); 
+const socketIo = require('socket.io')(server);
 
+  
+//IO Controllers
 const competitionController = require('./controllers/challenge')(socketIo, sessionStore);
+const adminController = require('./controllers/admin')(socketIo);
+  
 /**
  * Express configuration.
  */
@@ -125,6 +127,7 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 0 }));
 app.get('/', homeController.index);
 app.get('/rules', homeController.rules);
 app.get('/admin', passportConfig.isAdmin, adminController.index);
+app.post('/admin/control', passportConfig.isAdmin, adminController.control);
 app.get('/competition', passportConfig.isAuthenticated, competitionController);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
