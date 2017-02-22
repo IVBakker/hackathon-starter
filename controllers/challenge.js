@@ -62,6 +62,7 @@ function GameEngine(_io)
 				{
 					that.state = 'PREPARE';
 					console.log("New STATE:", that.state);
+					that.nextstatetime = nextGameDate();
 					that.io.sockets.emit('state', {state:that.state, html:that.renderState(),js:''});
 					break;
 				}

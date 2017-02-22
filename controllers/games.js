@@ -1,4 +1,6 @@
 var util = require('util');
+var fs = require('fs');
+var pug = require('pug');
 
 var GameBase = function() {
 	this.name = "Undefined";
@@ -18,18 +20,27 @@ GameBase.prototype.stop = function(){
 	this.started = false;
 };
 
+GameBase.prototype.getRules = function(){
+	var rule_view = 'views/games/'+this.codename+'/rules.pug';
+	return pug.renderFile(rule_view);
+};
+
 GameBase.prototype.getHTML = function(){
-	return '<h1>HELLO FROM THE GAME</h1>';
+	var game_view = 'views/games/'+this.codename+'/game.pug';
+	return pug.renderFile(game_view);
 };
 
 GameBase.prototype.getJS = function(){
-	return '';
+	
+	var rule_view = 'views/games/'+this.codename+'/game.js';
+	return fs.readFileSync(rule_view).toString();
 };
 
 var PressGame = function() {
 	GameBase.call(this);
 	this.name = "Click, Click, Click";
 	this.codename = "clickclick";
+	this.duration = 1000*60;
 };
 
 util.inherits(PressGame, GameBase);
