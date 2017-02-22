@@ -6,11 +6,12 @@ const pug = require('pug');
 
 function GameEngine(_io)
 {
-		this.io = _io;
-		this.games = [new games.PressGame()];
-		this.game = null;
-		this.state = 'PLAY'; //SCORE, PREPARE, PLAY
-		this.getScore = function()
+		var that = this;
+		that.io = _io;
+		that.games = [new games.PressGame()];
+		that.game = null;
+		that.state = 'PLAY'; //SCORE, PREPARE, PLAY
+		that.getScore = function()
 		{
 			return [{
 				'user':'U',
@@ -19,15 +20,22 @@ function GameEngine(_io)
 			}];
 		};
 		
-		this.nextstatetime = null;
+		that.nextstatetime = null;
+		that.timeout = null;
 		
-		this.nextStateWaitTime = function()
+		that.renderState = function()
 		{
-			var now = new Date();
-			return this.nextstatetime.getTime()-now.getTime();
+				var base_view = 'views/games/';
+				return pug.renderFile(base_view+this.state.toLocaleLowerCase()+'.pug', {engine:that, game:that.game});
 		};
 		
-		this.nextState = function()
+		that.nextStateWaitTime = function()
+		{
+			var now = new Date();
+			return that.nextstatetime.getTime()-now.getTime();
+		};
+		
+		that.nextState = function()
 		{
 			function nextGameDate()
 			{
@@ -47,57 +55,73 @@ function GameEngine(_io)
 				console.log("Next Game at", target);
 				return target;
 			}
-			switch(this.state)
+			
+			switch(that.state)
 			{
 				case 'SCORE':
 				{
-					this.state = 'PREPARE';
-					
-					
-					
-					
+					that.state = 'PREPARE';
+					console.log("New STATE:", that.state);
+					that.io.sockets.emit('state', {state:that.state, html:that.renderState(),js:''});
 					break;
 				}
 				case 'PREPARE':
 				{
-					this.state = 'PLAY';
-					this.nextstatetime = new Date((new Date()).getTime() + this.game.duration);
-					var game_info = this.game.start();
+					that.state = 'PLAY';
+					console.log("New STATE:", that.state);
+					var g_duration = that.game.start();
+					that.nextstatetime = new Date((new Date()).getTime() + g_duration);
+					that.io.sockets.emit('state', {state:that.state, html:that.game.getHTML(), js:that.game.getJS()});
 					break;
 				}
 				case 'PLAY':
 				{
-					this.state = 'SCORE';
+					that.state = 'SCORE';
+					console.log("New STATE:", that.state);
 					//Stop the game and play the score
-					if(this.game !== null)
+					if(that.game !== null)
 					{
 						//Stop the game if necessary
-						console.log("END of game", this.game.name);
-						var game_info = this.game.stop();
-						//Send next state to clients
+						console.log("END of game", that.game.name);
+						var game_info = that.game.stop();
 					}
-					this.game = this.games.shift();
-					console.log("Next game is:", this.game.name);
-					this.nextstatetime = new Date(nextGameDate().getTime()-1000*60*60);
+					if (that.games.length === 0)
+					{
+						
+						that.state = 'END';
+						console.log("New STATE:", that.state);
+					}
+					else
+					{
+						that.game = that.games.shift();
+						console.log("Next game is:", that.game.name);
+						that.nextstatetime = new Date(nextGameDate().getTime()-1000*60*60);
+					}
+					
+					that.io.sockets.emit('state', {state:that.state, html:that.renderState(),js:''});
 					break;
 				}
+				default:
+			}
+			if (that.timeout !== null)
+			{
+				clearTimeout(that.timeout);
+				that.timeout = null;
+			}
+			if (that.state !== 'END')
+			{
+				var waittime = that.nextStateWaitTime();
+				console.log("Waiting for next state: ", waittime);
+				that.timeout = that.setTimeout(function(){console.log("Timeout next state over");that.nextState();}, waittime);
 			}
 		};
 
-		this.nextState();
+		that.nextState();
 		
-						
-		this.renderState = function()
-		{
-				var base_view = 'views/games/';
-				
-				return pug.renderFile(base_view+this.state.toLocaleLowerCase()+'.pug', {engine:this, game:this.game});
-		};
-		
-		return this;
+		return that;
 }
 
-
+var gameengine = null;
 
 function getUserName(user)
 {
@@ -114,7 +138,7 @@ function getUserName(user)
 		}
 		return name;
 }
-module.exports = function(io, sessionstore)
+exports.setIo = function(io, sessionstore)
 {
 		io.use(passportSocketIo.authorize({
 			secret: process.env.SESSION_SECRET, // the session_secret to parse the cookie
@@ -132,15 +156,15 @@ module.exports = function(io, sessionstore)
 					socket.broadcast.emit('chat message', {'user':getUserName(socket.request.user),'msg':escape(msg)});
 				});
 		});
-		
-		var gameengine = GameEngine();		
-		
-		return function(req, res){
-				res.render('competition', {
-						title: 'IO Challenge',
-						engine: gameengine
-					});
-				};
+		gameengine = GameEngine(io);
+		return gameengine;
+};
+
+exports.controller = function(req, res){
+	res.render('competition', {
+			title: 'IO Challenge',
+			engine: gameengine
+		});
 };
 
 function onAuthorizeSuccess(data, accept){

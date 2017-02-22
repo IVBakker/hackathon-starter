@@ -1,11 +1,11 @@
 $(document).ready(function() {
-	$('.refresh').click(function(){
-		console.log("Refreshing people");
+	$('.admin_action').click(function(){
+		console.log("Admin action", $(this).attr('key'));
 		$.ajax({
 				type: "POST",
 				url: '/admin/control',
 				data: {
-						'key':'reload',
+						'key':$(this).attr('key'),
 						'_csrf':$('#csrf').attr('value')
 				}
 			});

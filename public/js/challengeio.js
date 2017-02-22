@@ -81,11 +81,11 @@ $(document).ready(function()
 			var new_html = data.html;
 			var new_js = data.js;
 			console.log('received:', data);
-			$(".page-include").fadeOut("slow", function()
+			$("#gamecontainer").fadeOut("slow", function()
 			{
-				$(".page-include").css('visibility','visible');
-				$(".page-include").html(new_html);
-				$(".page-include").fadeIn("slow");
+				$("#gamecontainer").css('visibility','visible');
+				$("#gamecontainer").html(new_html);
+				$("#gamecontainer").fadeIn("slow");
 				eval(new_js);
 			});
 		});

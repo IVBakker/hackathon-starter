@@ -63,8 +63,10 @@ const socketIo = require('socket.io')(server);
 
   
 //IO Controllers
-const competitionController = require('./controllers/challenge')(socketIo, sessionStore);
-const adminController = require('./controllers/admin')(socketIo);
+const challenge = require('./controllers/challenge');
+gameengine = challenge.setIo(socketIo, sessionStore);
+const competitionController = challenge.controller;
+const adminController = require('./controllers/admin')(socketIo,gameengine);
   
 /**
  * Express configuration.

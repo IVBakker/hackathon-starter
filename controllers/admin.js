@@ -1,4 +1,5 @@
 var io;
+var gameengine;
 
 function index(req, res){
 	res.render('admin', {
@@ -13,15 +14,24 @@ function control(req, res){
 		switch(req.body.key)
 		{
 				case 'reload':
+				{
 						io.sockets.emit('page_reload');
 						break;
+				}
+				case 'next':
+				{
+						gameengine.nextState();
+						break;
+				}
 				default:
 		}
+		res.end();
 };
 
-module.exports = function(_io)
+module.exports = function(_io,_engine)
 {
 		io = _io;		
+		gameengine = _engine;		
 		
 		return {
 				index: index,
