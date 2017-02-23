@@ -1,5 +1,6 @@
 $(document).ready(function()
 {
+	var STATE = null;
 		var socket_url = location.protocol + '//' + location.hostname + ':' + location.port;
 		var socket = io(socket_url);
 		function escapeHtml(str) {
@@ -25,7 +26,7 @@ $(document).ready(function()
 																								 class=' img-responsive '>\
 																</div>\
 												</div>";
-						console.log("Sending", msg)
+						console.log("Sending", msg);
 						socket.emit('chat message', msg);
 						$('#chat-input').val('');
 						$('.msg_container_base').append(send_msg);
@@ -75,12 +76,14 @@ $(document).ready(function()
 						$this.removeClass('glyphicon-plus').addClass('glyphicon-minus');
 				}
 		});
-
+		onAnswer = null;
 		socket.on('state', function(data)
 		{
 			var new_html = data.html;
 			var new_js = data.js;
+			STATE = data.state;
 			console.log('received:', data);
+			onAnswer = null;
 			$("#gamecontainer").fadeOut("slow", function()
 			{
 				$("#gamecontainer").css('visibility','visible');
@@ -93,6 +96,28 @@ $(document).ready(function()
 		socket.on('page_reload', function(){
 				console.log("Reloading page");
 				location.reload();
+		});
+		
+		function sendInput(input)
+		{
+			if(STATE === 'PLAY')
+				socket.emit('input', input);
+		}
+		
+		socket.on('answer', function(data)
+		{
+			if(onAnswer !== null)
+			{
+				if (data[0] === 'C')
+					onAnswer(data[1]);
+				else if (data[0] === 'E')
+				{
+					$("#gamecontainer").fadeOut("slow", function(){
+						$("#gamecontainer").html('<h1>You finished the game, waiting for game to finish</h1>');
+						$("#gamecontainer").fadeIn("slow");
+					});
+				}
+			}
 		});
 
 });

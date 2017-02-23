@@ -1,7 +1,7 @@
 extends layout
 
 block content
-		#gamecontainer !{engine.renderState()}
+		#gamecontainer !{html}
 
 block footer
 		.container
@@ -24,6 +24,7 @@ block footer
 								button#chat-btn.btn.btn-primary.btn-sm.chat-btn Send
 
 block scripts
-		link(rel='stylesheet', href='/css/chat.css')
-		script(src='/js/lib/socket.io-1.4.5.js')
-		script(src='/js/challengeio.js')
+	link(rel='stylesheet', href='/css/chat.css')
+	script(src='/js/lib/socket.io-1.4.5.js')
+	script(src='/js/challengeio.js')
+	script !{js}

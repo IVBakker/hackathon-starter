@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt-nodejs');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
+const Score = require('./Score');
 
 const userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
@@ -31,6 +32,19 @@ const userSchema = new mongoose.Schema({
  */
 userSchema.pre('save', function save(next) {
   const user = this;
+	Score.findOne({ email: user.email }, (err, score) => {
+		if (err) { console.error("Error checking user score", err);
+			return;
+		}
+		console.log("Score user existing:", score);
+		if (score === null) {
+			score = new Score();
+		}
+		score.email = user.email;
+		score.username = user.username;
+		score.save();
+	});
+	
   if (!user.isModified('password')) { return next(); }
   bcrypt.genSalt(10, (err, salt) => {
     if (err) { return next(err); }
@@ -50,6 +64,21 @@ userSchema.methods.comparePassword = function comparePassword(candidatePassword,
     cb(err, isMatch);
   });
 };
+
+userSchema.virtual('username').get(function() {
+	var name=this.email;
+	if(this.profile && this.profile.name)
+	{
+			var aname = this.profile.name.split(' ');
+			if (aname.length > 1 && aname[0].length > 0)
+			{
+					name = aname[1] + ' ' + aname[0][0];
+			}
+			else
+					name = this.profile.name;
+	}
+		return name;
+});
 
 /**
  * Helper method for getting user's gravatar.

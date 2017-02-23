@@ -129,6 +129,7 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 0 }));
 app.get('/', homeController.index);
 app.get('/rules', homeController.rules);
 app.get('/admin', passportConfig.isAdmin, adminController.index);
+app.get('/admin/test', passportConfig.isAdmin, adminController.test);
 app.post('/admin/control', passportConfig.isAdmin, adminController.control);
 app.get('/competition', passportConfig.isAuthenticated, competitionController);
 app.get('/login', userController.getLogin);

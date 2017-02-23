@@ -8,8 +8,8 @@ include countdown
 				th User
 				th Score
 		tbody
-				each user in engine.getScore()
+				each user in engine.scoreboard
 						tr
 							td= user.email
-							td= user.user
+							td= user.username
 							td= user.score

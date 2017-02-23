@@ -1,11 +1,21 @@
 var io;
 var gameengine;
+var games = require('./games');
 
 function index(req, res){
 	res.render('admin', {
 		title: 'Admin'
 	});
 };
+
+function gameTest(req, res){
+	var this_game = new games.PressGame();
+	res.render('gametest', {
+		title: 'Admin Test Room',
+		html: this_game.getHTML(),
+		js: this_game.getJS()
+	});
+}
 
 function control(req, res){
 		
@@ -23,6 +33,11 @@ function control(req, res){
 						gameengine.nextState();
 						break;
 				}
+				case 'scoreboard':
+				{
+						gameengine.updateScoreboard();
+						break;
+				}
 				default:
 		}
 		res.end();
@@ -35,6 +50,7 @@ module.exports = function(_io,_engine)
 		
 		return {
 				index: index,
+				test: gameTest,
 				control: control
 		};		
 };

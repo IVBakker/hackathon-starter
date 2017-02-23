@@ -1,8 +1,10 @@
 // initialize our modules
 var passportSocketIo = require("passport.socketio");
+var Promise = require('es6-promise').Promise;
 var escape = require('escape-html');
 var games = require('./games');
 const pug = require('pug');
+const Score = require('../models/Score')
 
 function GameEngine(_io)
 {
@@ -11,17 +13,30 @@ function GameEngine(_io)
 		that.games = [new games.PressGame()];
 		that.game = null;
 		that.state = 'PLAY'; //SCORE, PREPARE, PLAY
-		that.getScore = function()
+		that.scoreboard = [];
+		
+		that.updateScoreboard = function()
 		{
-			return [{
-				'user':'U',
-				'email':'E',
-				'score':'1'
-			}];
+			Score.find({}, function(err, scores){
+				that.scoreboard = scores;
+			});
 		};
 		
 		that.nextstatetime = null;
 		that.timeout = null;
+		
+		that.handle = function(socket,email,input)
+		{
+			if(that.state === 'PLAY')
+			{
+				var answer = that.game.handle(email, input);
+				console.log('INPUT:', input, 'ANSWER:', answer);
+				if (['C','E'].indexOf(answer[0]) !== -1)
+				{
+					socket.emit('answer', answer);
+				}
+			}
+		};
 		
 		that.renderState = function()
 		{
@@ -72,7 +87,7 @@ function GameEngine(_io)
 					console.log("New STATE:", that.state);
 					var g_duration = that.game.start();
 					that.nextstatetime = new Date((new Date()).getTime() + g_duration);
-					that.io.sockets.emit('state', {state:that.state, html:that.game.getHTML(), js:that.game.getJS()});
+					that.io.sockets.emit('state', {state:that.state, codename:that.game.codename, html:that.game.getHTML(), js:that.game.getJS()});
 					break;
 				}
 				case 'PLAY':
@@ -84,7 +99,10 @@ function GameEngine(_io)
 					{
 						//Stop the game if necessary
 						console.log("END of game", that.game.name);
-						var game_info = that.game.stop();
+						that.game.stop();
+						var player_results = that.game.players;
+						//TODO
+						that.updateScoreboard();
 					}
 					if (that.games.length === 0)
 					{
@@ -118,27 +136,14 @@ function GameEngine(_io)
 		};
 
 		that.nextState();
+		that.updateScoreboard();
 		
 		return that;
 }
 
 var gameengine = null;
 
-function getUserName(user)
-{
-		var name= user.email;
-		if(user.profile && user.profile.name)
-		{
-				var aname = user.profile.name.split(' ');
-				if (aname.length > 1 && aname[0].length > 0)
-				{
-						name = aname[1] + ' ' + aname[0][0];
-				}
-				else
-						name = user.profile.name;
-		}
-		return name;
-}
+
 exports.setIo = function(io, sessionstore)
 {
 		io.use(passportSocketIo.authorize({
@@ -154,7 +159,11 @@ exports.setIo = function(io, sessionstore)
 				socket.on('chat message', function(msg)
 				{
 //					console.log("Message received", msg);
-					socket.broadcast.emit('chat message', {'user':getUserName(socket.request.user),'msg':escape(msg)});
+					socket.broadcast.emit('chat message', {'user':socket.request.user.username,'msg':escape(msg)});
+				});
+				socket.on('input', function(input)
+				{
+					gameengine.handle(socket,socket.request.user.email,input);
 				});
 		});
 		gameengine = GameEngine(io);
