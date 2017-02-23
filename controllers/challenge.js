@@ -27,8 +27,9 @@ function GameEngine(_io)
 		
 		that.handle = function(socket,email,input)
 		{
-			if(that.state === 'PLAY')
+			if(that.state === 'PLAY' && that.game !== null)
 			{
+//				console.log("GAME", that.game);
 				var answer = that.game.handle(email, input);
 				console.log('INPUT:', input, 'ANSWER:', answer);
 				if (['C','E'].indexOf(answer[0]) !== -1)
@@ -87,7 +88,7 @@ function GameEngine(_io)
 					console.log("New STATE:", that.state);
 					var g_duration = that.game.start();
 					that.nextstatetime = new Date((new Date()).getTime() + g_duration);
-					that.io.sockets.emit('state', {state:that.state, codename:that.game.codename, html:that.game.getHTML(), js:that.game.getJS()});
+					that.io.sockets.emit('state', {state:that.state, name:that.game.name, html:that.game.getHTML(), js:that.game.getJS()});
 					break;
 				}
 				case 'PLAY':
@@ -106,9 +107,9 @@ function GameEngine(_io)
 					}
 					if (that.games.length === 0)
 					{
-						
-						that.state = 'END';
 						console.log("New STATE:", that.state);
+						that.state = 'END';
+						that.game = null;
 					}
 					else
 					{

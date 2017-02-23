@@ -82,6 +82,10 @@ $(document).ready(function()
 			var new_html = data.html;
 			var new_js = data.js;
 			STATE = data.state;
+			if(STATE === 'PLAY')
+				new Notification("GG 2017", {body: "Game "+data.name+" has started!"});
+			else if (STATE === 'PREPARE')
+				new Notification("GG 2017", {body: "New game rules have been announced!"});
 			console.log('received:', data);
 			onAnswer = null;
 			$("#gamecontainer").fadeOut("slow", function()

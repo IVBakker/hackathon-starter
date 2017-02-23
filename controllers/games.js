@@ -26,6 +26,11 @@ GameBase.prototype.getStartData = function(){
 	return null;
 };
 
+GameBase.prototype.handle = function(){
+	//TO OVERWRITE
+	throw new Error('HANDLE FUNCTION TO OVERWRITE');
+}
+
 GameBase.prototype.prehandle = function(email, input){
 	var p = this.players.find(function(player){return player['email'] === email;});
 	if(p === undefined)
@@ -65,6 +70,8 @@ var PressGame = function() {
 	this.duration = 1000*60;
 };
 
+util.inherits(PressGame, GameBase);
+
 PressGame.prototype.getStartData = function(){
 	return 0;
 };
@@ -74,7 +81,7 @@ PressGame.prototype.handle = function(email, input){
 	{
 		var p = this.prehandle(email,input);
 		p['data']+=1;
-		console.log("Player input", p);
+//		console.log("Player input", p);
 
 		return ['C', p['data']]; //Continue
 	}
@@ -87,7 +94,5 @@ PressGame.prototype.stop = function() {
 	this.players = this.players.map(function(c,i){c['score'] = Math.max(1,10-i); return c;});
 	console.log("Players finish state:", this.players);
 };
-
-util.inherits(PressGame, GameBase);
 
 exports.PressGame = PressGame;
