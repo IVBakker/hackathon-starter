@@ -1,6 +1,8 @@
 var io;
 var gameengine;
 var games = require('./games');
+var Score = require('../models/Score');
+var Action = require('../models/UserAction');
 
 function index(req, res){
 	res.render('admin', {
@@ -20,7 +22,7 @@ function gameTest(req, res){
 function control(req, res){
 		
 		console.log("KEY", req.body.key);
-		console.log("BODY", req.body);
+//		console.log("BODY", req.body);
 		switch(req.body.key)
 		{
 				case 'reload':
@@ -37,6 +39,12 @@ function control(req, res){
 				{
 						gameengine.updateScoreboard();
 						break;
+				}
+				case 'drop':
+				{
+					Action.remove({}).exec();
+					Score.remove({}, function(){gameengine.updateScoreboard();});
+					break;
 				}
 				default:
 		}

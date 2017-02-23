@@ -1,6 +1,7 @@
 var util = require('util');
 var fs = require('fs');
 var pug = require('pug');
+var Action = require('../models/UserAction');
 
 var GameBase = function() {
 	this.name = "Undefined";
@@ -29,7 +30,7 @@ GameBase.prototype.getStartData = function(){
 GameBase.prototype.handle = function(){
 	//TO OVERWRITE
 	throw new Error('HANDLE FUNCTION TO OVERWRITE');
-}
+};
 
 GameBase.prototype.prehandle = function(email, input){
 	var p = this.players.find(function(player){return player['email'] === email;});
@@ -44,7 +45,13 @@ GameBase.prototype.prehandle = function(email, input){
 		};
 		this.players.push(p);
 	}
-	p['actions'].push([new Date(),input]);
+	var action = new Action();
+	action.email = email;
+	action.game = this.name;
+	action.action = input;
+	action.time = new Date();
+	
+	p['actions'].push(action);
 	return p;
 };
 
@@ -92,7 +99,7 @@ PressGame.prototype.stop = function() {
 	GameBase.prototype.stop.call(this);
 	this.players.sort(function(a,b){return a['data'] - b['data'];});
 	this.players = this.players.map(function(c,i){c['score'] = Math.max(1,10-i); return c;});
-	console.log("Players finish state:", this.players);
+//	console.log("Players finish state:", this.players);
 };
 
 exports.PressGame = PressGame;

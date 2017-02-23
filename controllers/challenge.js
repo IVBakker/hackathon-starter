@@ -13,13 +13,19 @@ function GameEngine(_io)
 		that.games = [new games.PressGame()];
 		that.game = null;
 		that.state = 'PLAY'; //SCORE, PREPARE, PLAY
+		that.lastgameinfo = null;
 		that.scoreboard = [];
 		
-		that.updateScoreboard = function()
+		that.updateScoreboard = function(callback)
 		{
 			Score.find({}, function(err, scores){
 				that.scoreboard = scores;
+				console.log("Updating Scoreboard:");
+				scores.forEach(function(s){console.log(s.email,': ',s.score);});
+				if(callback !== undefined)
+					callback();
 			});
+			
 		};
 		
 		that.nextstatetime = null;
@@ -101,9 +107,37 @@ function GameEngine(_io)
 						//Stop the game if necessary
 						console.log("END of game", that.game.name);
 						that.game.stop();
+						var game_name = that.game.name;
 						var player_results = that.game.players;
-						//TODO
-						that.updateScoreboard();
+						var nplayer_results = player_results.length;
+						player_results.forEach(function(p,i)
+						{
+							console.log("Saving Score for ", p.email,"- score",p.score," ",i+1,"/",nplayer_results);
+							Score.findOne({ email: p.email }, function(err, existingScore)
+							{
+								if(!existingScore)
+								{
+									console.log("THIS USER DOES NOT HAVE A SCORE");
+									existingScore = new Score();
+									existingScore.email = p.email;
+									existingScore.username = p.email;
+								}
+								existingScore.scores.push({score:p.score,game:game_name});
+								existingScore.save(function(){
+									if (i === nplayer_results-1)
+									{
+										that.updateScoreboard(function(){that.io.sockets.emit('state', {state:that.state, html:that.renderState(),js:''});});
+										
+									}
+								});
+							});
+							
+							p.actions.forEach(function(a){
+								a.save();
+							});
+							
+						});
+						
 					}
 					if (that.games.length === 0)
 					{
@@ -118,7 +152,6 @@ function GameEngine(_io)
 						that.nextstatetime = new Date(nextGameDate().getTime()-1000*60*60);
 					}
 					
-					that.io.sockets.emit('state', {state:that.state, html:that.renderState(),js:''});
 					break;
 				}
 				default:
