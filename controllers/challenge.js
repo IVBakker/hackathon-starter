@@ -5,20 +5,22 @@ var escape = require('escape-html');
 var games = require('./games');
 const pug = require('pug');
 const Score = require('../models/Score')
+const GameScore = require('../models/GameScore')
 
 function GameEngine(_io)
 {
 		var that = this;
 		that.io = _io;
-		that.games = [new games.PressGame()];
+		that.games = [new games.MathGame(), new games.PressGame()];
+//		that.games = [new games.MathGame()];
 		that.game = null;
 		that.state = 'PLAY'; //SCORE, PREPARE, PLAY
-		that.lastgameinfo = null;
+		that.lastgamescores = null;
 		that.scoreboard = [];
 		
 		that.updateScoreboard = function(callback)
 		{
-			Score.find({}, function(err, scores){
+			Score.find({},{},{ sort: { 'score' : -1 } }, function(err, scores){
 				that.scoreboard = scores;
 				console.log("Updating Scoreboard:");
 				scores.forEach(function(s){console.log(s.email,': ',s.score);});
@@ -38,7 +40,7 @@ function GameEngine(_io)
 //				console.log("GAME", that.game);
 				var answer = that.game.handle(email, input);
 				console.log('INPUT:', input, 'ANSWER:', answer);
-				if (['C','E'].indexOf(answer[0]) !== -1)
+				if (['C','E','F'].indexOf(answer[0]) !== -1)
 				{
 					socket.emit('answer', answer);
 				}
@@ -106,7 +108,7 @@ function GameEngine(_io)
 					{
 						//Stop the game if necessary
 						console.log("END of game", that.game.name);
-						that.game.stop();
+						that.lastgamescores = that.game.stop();
 						var game_name = that.game.name;
 						var player_results = that.game.players;
 						var nplayer_results = player_results.length;
@@ -127,7 +129,6 @@ function GameEngine(_io)
 									if (i === nplayer_results-1)
 									{
 										that.updateScoreboard(function(){that.io.sockets.emit('state', {state:that.state, html:that.renderState(),js:''});});
-										
 									}
 								});
 							});
@@ -170,6 +171,14 @@ function GameEngine(_io)
 		};
 
 		that.nextState();
+		GameScore.findOne({}, {}, { sort: { 'createdAt' : -1 } }, function(err, score) {
+			if(score)
+			{
+				console.log("Last game score found:", score.name);
+				score.scores.sort(function(a,b){return b['score']-a['score'];});
+				that.lastgamescores = score;
+			}
+		});
 		that.updateScoreboard();
 		
 		return that;

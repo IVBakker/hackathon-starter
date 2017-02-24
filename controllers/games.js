@@ -2,6 +2,7 @@ var util = require('util');
 var fs = require('fs');
 var pug = require('pug');
 var Action = require('../models/UserAction');
+var GameScore = require('../models/GameScore');
 
 var GameBase = function() {
 	this.name = "Undefined";
@@ -30,6 +31,11 @@ GameBase.prototype.getStartData = function(){
 GameBase.prototype.handle = function(){
 	//TO OVERWRITE
 	throw new Error('HANDLE FUNCTION TO OVERWRITE');
+};
+
+GameBase.prototype.getFinalScore = function(){
+	//TO OVERWRITE
+	throw new Error('FINAL SCORE FUNCTION TO OVERWRITE');
 };
 
 GameBase.prototype.prehandle = function(email, input){
@@ -62,7 +68,7 @@ GameBase.prototype.getRules = function(){
 
 GameBase.prototype.getHTML = function(){
 	var game_view = 'views/games/'+this.codename+'/game.pug';
-	return pug.renderFile(game_view);
+	return pug.renderFile(game_view, {data:this.getStartData()});
 };
 
 GameBase.prototype.getJS = function(){
@@ -70,6 +76,9 @@ GameBase.prototype.getJS = function(){
 	return fs.readFileSync(rule_view).toString();
 };
 
+
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 var PressGame = function() {
 	GameBase.call(this);
 	this.name = "Click, Click, Click";
@@ -97,9 +106,94 @@ PressGame.prototype.handle = function(email, input){
 
 PressGame.prototype.stop = function() {
 	GameBase.prototype.stop.call(this);
-	this.players.sort(function(a,b){return a['data'] - b['data'];});
+	this.players.sort(function(a,b){return b['data'] - a['data'];});
+//	var cur_index = 0;
+//	var cur_value = null;
+//	for (var current_score = 10; ++cur_index; current_score > 1)
+//	{
+//		if(cur_value === null || this.players[cur_index]['data'] === cur_value)
+//		{
+//			
+//		}
+//		else
+//		{
+//			cur_value = this.players[cur_index]['data'];
+//			
+//		}
+//			
+//	}
 	this.players = this.players.map(function(c,i){c['score'] = Math.max(1,10-i); return c;});
+	final_score =  this.players.map(function(p){
+		return {email: p.email, score: p.data};
+	});
+	final_score.sort(function(a,b){return a['score'] - b['score'];});
+	var gamescore = new GameScore();
+	gamescore.name = this.name;
+	gamescore.codename = this.codename;
+	gamescore.scores = final_score;
+	gamescore.save();
+	return gamescore;
 //	console.log("Players finish state:", this.players);
 };
 
 exports.PressGame = PressGame;
+
+var MathGame = function() {
+	GameBase.call(this);
+	this.name = "1+1? 11?";
+	this.codename = "maths";
+	this.duration = 1000*60;
+};
+
+util.inherits(MathGame, GameBase);
+
+MathGame.prototype.getStartData = function(){
+	return {
+		score:0,
+		problems:[['1+1',2],['7+8*3',31],['21-17+5',9],['12*11',132],['99/9',11],['4*3+2*6*1',24],['10*18*3+2',542],['5*7*9-77',2],['23-9*6+465',2],['123-46',2],
+		['3*(4+6+23)',99],['147 + 680',2],['23*7',2],['53*12',2],['101-9-8-7-6-5',2],['',2],['',2],['',2],['',2],['',2],['',2],
+		['',2],['',2],['',2],['',2],['',2],['',2],['',2],['',2],['',2],['',2],['',2],
+		['',2],['',2],['',2],['',2],['',2],['',2],['',2],['',2],['',2],['',2],['',2],
+		['',2],['',2],['',2],['',2],['',2],['',2],['',2],['',2],['',2],['',2],['',2],
+		['',2],['',2],['',2],['',2],['',2],['',2],['',2],['',2],['',2],['',2],['',2]
+		]
+	};
+};
+
+MathGame.prototype.handle = function(email, input){
+	if(this.started)
+	{
+		var p = this.prehandle(email,input);
+		console.log('Input math',input,'Expected', p['data']['problems'][0]);
+		if(input === p['data']['problems'][0][1])
+		{
+			 p['data']['score'] += 1;
+			 p['data']['problems'].shift();
+			 return ['C', p['data']['problems'][0][0]]; //Continue
+		}
+		else
+		{
+			p['data']['score'] -= 0.5;
+			return ['F', -1];
+		}
+	}
+	return ['E', -1]; //Ended
+};
+
+MathGame.prototype.stop = function() {
+	GameBase.prototype.stop.call(this);
+	this.players.sort(function(a,b){return b['data']['score'] - a['data']['score'];});
+	this.players = this.players.map(function(c,i){c['score'] = Math.max(1,10-i); return c;});
+	final_score =  this.players.map(function(p){
+		return {email: p.email, score: p.data['score']};
+	});
+	final_score.sort(function(a,b){return a['score'] - b['score'];});
+	var gamescore = new GameScore();
+	gamescore.name = this.name;
+	gamescore.codename = this.codename;
+	gamescore.scores = final_score;
+	gamescore.save();
+	return gamescore;
+};
+
+exports.MathGame = MathGame;

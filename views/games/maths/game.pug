@@ -1,0 +1,12 @@
+h1 COUNT COUNT COUNT!
+row
+	.col-sm-offset-3.col-sm-6.text-center
+		#THECALC(style='font-size:45px;') !{data.problems[0][0]}
+		form#THECALCFORM
+			.form-group
+				label(for='usr') Answer:
+				input#THECALCINPUT.form-control(type='text')
+		#THECALCALERT.alert.alert-danger(style="display: none;") WRONG!
+
+
+

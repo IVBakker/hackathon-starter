@@ -110,17 +110,18 @@ $(document).ready(function()
 		
 		socket.on('answer', function(data)
 		{
+//			console.log('ANSWER:', data);
 			if(onAnswer !== null)
 			{
-				if (data[0] === 'C')
-					onAnswer(data[1]);
-				else if (data[0] === 'E')
+				if (data[0] === 'E')
 				{
 					$("#gamecontainer").fadeOut("slow", function(){
 						$("#gamecontainer").html('<h1>You finished the game, waiting for game to finish</h1>');
 						$("#gamecontainer").fadeIn("slow");
 					});
 				}
+				else
+					onAnswer(data[0], data[1]);
 			}
 		});
 

@@ -1,4 +1,4 @@
-onAnswer = function(count)
+onAnswer = function(status, count)
 {
 	$('#THEBUTTONC').text(count);
 };

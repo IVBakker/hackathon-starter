@@ -3,6 +3,7 @@ var gameengine;
 var games = require('./games');
 var Score = require('../models/Score');
 var Action = require('../models/UserAction');
+var GameScore = require('../models/GameScore');
 
 function index(req, res){
 	res.render('admin', {
@@ -11,7 +12,8 @@ function index(req, res){
 };
 
 function gameTest(req, res){
-	var this_game = new games.PressGame();
+//	var this_game = new games.PressGame();
+	var this_game = new games.MathGame();
 	res.render('gametest', {
 		title: 'Admin Test Room',
 		html: this_game.getHTML(),
@@ -43,6 +45,7 @@ function control(req, res){
 				case 'drop':
 				{
 					Action.remove({}).exec();
+					GameScore.remove({}).exec();
 					Score.remove({}, function(){gameengine.updateScoreboard();});
 					break;
 				}
