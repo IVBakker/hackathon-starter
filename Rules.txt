@@ -1,15 +1,15 @@
 Agilite
-- Touches (haut-bas-gauche-droite) a consommer dans l'ordre le plus rapidement. Une second de penalite si faute faite
-- Lorem Ipsum a re-ecrire le plus vite possible
+-= Touches (haut-bas-gauche-droite) a consommer dans l'ordre le plus rapidement
+-= Lorem Ipsum a re-ecrire le plus vite possible
 - Cercles de clic dans un espace de plus en plus petit (avec un minima) qui ne cessent de bouger. Le but etant de cliquer sur le plus de cercles en 1min
 - Une minute pour arriver a appuyer sur une touche start puis appuyer sur la touche stop le plus pres des 10sec sans depasser.
 
 Force
-- Appuyer sur une touche le plus de fois possible en 1min
+-= Appuyer sur une touche le plus de fois possible en 1min
 - Tout le monde est attribue une lettre, le but etant d'arriver a toucher le plus de personne avec des attaques de lettres. Pour lancer une attaque il suffit d'appuyer sur la lettre de la personne en minuscule. La personne attaque recoit la lettre de l'attaquant en Majuscule. Attaquer ne peut envoyer qu'une lettre toutes les 0.2s. Lorsqu'on recoit une lettre on a une seconde pour l'enlever. On se defend avec majuscule + la lettre. Le status de vie est en forme de roue de 26 lettres
 - controles 2 cubes en vue du dessus pour nettoyer une surface de gros cubes. Chaque cubes personnels etant controles par ZQSD et IJKL. Pour enlever un cube il faut butter contre un gros cube X fois (X etant le nombre de point de vie du cube).
 
 Intelligence
-- Concours d'addition/sourstraction/multiplication en 1min
-- 6 villes a parcourir en google street 10 propositions. 5min en tout pour le faire
-- Discussion a choix multiples avec retour au debut si erreur. 5min pour finir ou aller le plus loin possible.
+-= Concours d'addition/sourstraction/multiplication en 1min
+-= 6 villes a parcourir en google street 10 propositions. 5min en tout pour le faire
+-= Discussion a choix multiples avec retour au debut si erreur. 5min pour finir ou aller le plus loin possible.

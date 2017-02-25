@@ -1,0 +1,19 @@
+h1 FASTER FASTER FASTER!
+row
+	.col-md-6.text-nowrap.text-center
+		#THEDANCEARROWS(style='height:700px; overflow-y: hidden; font-size:45px;border-top: solid 1px black;')
+			each step in data.steps
+				div
+					if step === 'U'
+						span.glyphicon.glyphicon-arrow-up(aria-hidden="true")
+					else if step === 'D'
+						span.glyphicon.glyphicon-arrow-down(aria-hidden="true")
+					else if step === 'L'
+						span.glyphicon.glyphicon-arrow-left(aria-hidden="true")
+					else if step === 'R'
+						span.glyphicon.glyphicon-arrow-right(aria-hidden="true")
+	.col-md-6.text-center
+		#THEDANCEALERT.alert.alert-danger(style="display: none;") OOPS!
+
+
+
