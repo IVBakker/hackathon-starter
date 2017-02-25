@@ -15,7 +15,7 @@ function GameEngine(_io)
 //		new games.PressGame(),
 //		new games.MazeGame(),
 //		new games.GeoGame()];
-		that.games = [new games.LoremGame(), new games.PressGame()];
+		that.games = [new games.PressGame(), new games.LoremGame()];
 		that.game = null;
 		that.state = 'PLAY'; //SCORE, PREPARE, PLAY
 		that.lastgamescores = null;
@@ -23,8 +23,8 @@ function GameEngine(_io)
 		
 		that.updateScoreboard = function(callback)
 		{
-			Score.find({},{},{ sort: { 'score' : -1 } }, function(err, scores){
-				that.scoreboard = scores;
+			Score.find({},{}, function(err, scores){
+				that.scoreboard = scores.sort(function(a,b){return b.score - a.score;});
 				console.log("Updating Scoreboard:");
 				scores.forEach(function(s){console.log(s.email,': ',s.score);});
 				if(callback !== undefined)
@@ -178,7 +178,7 @@ function GameEngine(_io)
 			if(score)
 			{
 				console.log("Last game score found:", score.name);
-				score.scores.sort(function(a,b){return b['score']-a['score'];});
+				score.scores.sort(function(a,b){return b.score-a.score;});
 				that.lastgamescores = score;
 			}
 		});

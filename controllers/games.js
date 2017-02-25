@@ -107,26 +107,25 @@ PressGame.prototype.handle = function(email, input){
 PressGame.prototype.stop = function() {
 	GameBase.prototype.stop.call(this);
 	this.players.sort(function(a,b){return b['data'] - a['data'];});
-//	var cur_index = 0;
-//	var cur_value = null;
-//	for (var current_score = 10; ++cur_index; current_score > 1)
-//	{
-//		if(cur_value === null || this.players[cur_index]['data'] === cur_value)
-//		{
-//			
-//		}
-//		else
-//		{
-//			cur_value = this.players[cur_index]['data'];
-//			
-//		}
-//			
-//	}
-	this.players = this.players.map(function(c,i){c['score'] = Math.max(1,10-i); return c;});
+	var cur_gamescore = null;
+	var cur_rewardscore = 10;
+	for(var i=0;i<this.players.length;++i)
+	{
+		var cur_player = this.players[i];
+		if(cur_gamescore!== null && cur_player['data'] !== cur_gamescore)
+		{
+			--cur_rewardscore;
+		}
+		if(cur_rewardscore === 1)
+			break;
+		cur_gamescore = cur_player['data'];
+		cur_player['score'] = cur_rewardscore;
+	}
+	
 	final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data};
 	});
-	final_score.sort(function(a,b){return a['score'] - b['score'];});
+	final_score.sort(function(a,b){return b['score'] - a['score'];});
 	var gamescore = new GameScore();
 	gamescore.name = this.name;
 	gamescore.codename = this.codename;
@@ -183,11 +182,25 @@ MathGame.prototype.handle = function(email, input){
 MathGame.prototype.stop = function() {
 	GameBase.prototype.stop.call(this);
 	this.players.sort(function(a,b){return b['data']['score'] - a['data']['score'];});
-	this.players = this.players.map(function(c,i){c['score'] = Math.max(1,10-i); return c;});
+	var cur_gamescore = null;
+	var cur_rewardscore = 10;
+	for(var i=0;i<this.players.length;++i)
+	{
+		var cur_player = this.players[i];
+		if(cur_gamescore!== null && cur_player['data']['score'] !== cur_gamescore)
+		{
+			--cur_rewardscore;
+		}
+		if(cur_rewardscore === 1)
+			break;
+		cur_gamescore = cur_player['data']['score'];
+		
+		cur_player['score'] = cur_rewardscore;
+	}
 	final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['score']};
 	});
-	final_score.sort(function(a,b){return a['score'] - b['score'];});
+	final_score.sort(function(a,b){return b['score'] - a['score'];});
 	var gamescore = new GameScore();
 	gamescore.name = this.name;
 	gamescore.codename = this.codename;
@@ -243,11 +256,26 @@ GeoGame.prototype.handle = function(email, input){
 GeoGame.prototype.stop = function() {
 	GameBase.prototype.stop.call(this);
 	this.players.sort(function(a,b){return b['data']['score'] - a['data']['score'];});
-	this.players = this.players.map(function(c,i){c['score'] = Math.max(1,10-i); return c;});
+	var cur_gamescore = null;
+	var cur_rewardscore = 10;
+	for(var i=0;i<this.players.length;++i)
+	{
+		var cur_player = this.players[i];
+		if(cur_gamescore!== null && cur_player['data']['score'] !== cur_gamescore)
+		{
+			--cur_rewardscore;
+		}
+		if(cur_rewardscore === 1)
+			break;
+		cur_gamescore = cur_player['data']['score'];
+		
+		cur_player['score'] = cur_rewardscore;
+	}
+	
 	final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['score']};
 	});
-	final_score.sort(function(a,b){return a['score'] - b['score'];});
+	final_score.sort(function(a,b){return b['score'] - a['score'];});
 	var gamescore = new GameScore();
 	gamescore.name = this.name;
 	gamescore.codename = this.codename;
@@ -299,11 +327,25 @@ MazeGame.prototype.handle = function(email, input){
 MazeGame.prototype.stop = function() {
 	GameBase.prototype.stop.call(this);
 	this.players.sort(function(a,b){return b['data']['deep'] - a['data']['deep'];});
-	this.players = this.players.map(function(c,i){c['score'] = Math.max(1,10-i); return c;});
+	var cur_gamescore = null;
+	var cur_rewardscore = 10;
+	for(var i=0;i<this.players.length;++i)
+	{
+		var cur_player = this.players[i];
+		if(cur_gamescore!== null && cur_player['data']['deep'] !== cur_gamescore)
+		{
+			--cur_rewardscore;
+		}
+		if(cur_rewardscore === 1)
+			break;
+		cur_gamescore = cur_player['data']['deep'];
+		
+		cur_player['score'] = cur_rewardscore;
+	}
 	final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['deep']};
 	});
-	final_score.sort(function(a,b){return a['score'] - b['score'];});
+	final_score.sort(function(a,b){return b['score'] - a['score'];});
 	var gamescore = new GameScore();
 	gamescore.name = this.name;
 	gamescore.codename = this.codename;
@@ -354,11 +396,25 @@ LoremGame.prototype.handle = function(email, input){
 LoremGame.prototype.stop = function() {
 	GameBase.prototype.stop.call(this);
 	this.players.sort(function(a,b){return b['data']['score'] - a['data']['score'];});
-	this.players = this.players.map(function(c,i){c['score'] = Math.max(1,10-i); return c;});
+	var cur_gamescore = null;
+	var cur_rewardscore = 10;
+	for(var i=0;i<this.players.length;++i)
+	{
+		var cur_player = this.players[i];
+		if(cur_gamescore!== null && cur_player['data']['score'] !== cur_gamescore)
+		{
+			--cur_rewardscore;
+		}
+		if(cur_rewardscore === 1)
+			break;
+		cur_gamescore = cur_player['data']['score'];
+		
+		cur_player['score'] = cur_rewardscore;
+	}
 	final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['score']};
 	});
-	final_score.sort(function(a,b){return a['score'] - b['score'];});
+	final_score.sort(function(a,b){return b['score'] - a['score'];});
 	var gamescore = new GameScore();
 	gamescore.name = this.name;
 	gamescore.codename = this.codename;
