@@ -11,8 +11,10 @@ function GameEngine(_io)
 {
 		var that = this;
 		that.io = _io;
-//		that.games = [new games.MathGame(), new games.PressGame()];
-		that.games = [new games.GeoGame()];
+//		that.games = [new games.MathGame(),
+//		new games.PressGame(),
+//		new games.GeoGame()];
+		that.games = [new games.MazeGame()];
 		that.game = null;
 		that.state = 'PLAY'; //SCORE, PREPARE, PLAY
 		that.lastgamescores = null;

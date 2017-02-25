@@ -257,3 +257,59 @@ GeoGame.prototype.stop = function() {
 };
 
 exports.GeoGame = GeoGame;
+
+var MazeGame = function() {
+	GameBase.call(this);
+	this.name = "Left or Right?";
+	this.codename = "leftright";
+	this.duration = 1000*60;
+};
+
+util.inherits(MazeGame, GameBase);
+
+MazeGame.prototype.getStartData = function(){
+	return {
+		deep:0,
+		directions:'LRRLRRLRLLRLRRLLLLRLRLLRLLRLLRRLLRRLLLRLRLLRRLRLRLLRLRLLRLLRRLRLLRLLRRRLRRRLRLRLLRLRLLRLL',
+		curdeep:0
+	};
+};
+
+MazeGame.prototype.handle = function(email, input){
+	if(this.started)
+	{
+		var p = this.prehandle(email,input);
+		console.log(email, 'Input direction',input);
+		if(p['data']['directions'][p['data']['curdeep']] === input)
+		{
+			p['data']['curdeep']+=1;
+			 if(p['data']['curdeep']> p['data']['deep'])
+				 p['data']['deep'] = p['data']['curdeep'];
+			 return ['C',input]; //Continue
+		}
+		else
+		{
+			p['data']['curdeep'] = 0;
+			return ['F', input];
+		}
+	}
+	return ['E', -1]; //Ended
+};
+
+MazeGame.prototype.stop = function() {
+	GameBase.prototype.stop.call(this);
+	this.players.sort(function(a,b){return b['data']['deep'] - a['data']['deep'];});
+	this.players = this.players.map(function(c,i){c['score'] = Math.max(1,10-i); return c;});
+	final_score =  this.players.map(function(p){
+		return {email: p.email, score: p.data['deep']};
+	});
+	final_score.sort(function(a,b){return a['score'] - b['score'];});
+	var gamescore = new GameScore();
+	gamescore.name = this.name;
+	gamescore.codename = this.codename;
+	gamescore.scores = final_score;
+	gamescore.save();
+	return gamescore;
+};
+
+exports.MazeGame = MazeGame;
