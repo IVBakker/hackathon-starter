@@ -13,7 +13,8 @@ function index(req, res){
 
 function gameTest(req, res){
 //	var this_game = new games.PressGame();
-	var this_game = new games.MathGame();
+//	var this_game = new games.MathGame();
+	var this_game = new games.GeoGame();
 	res.render('gametest', {
 		title: 'Admin Test Room',
 		html: this_game.getHTML(),

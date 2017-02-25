@@ -173,7 +173,7 @@ MathGame.prototype.handle = function(email, input){
 		}
 		else
 		{
-			p['data']['score'] -= 0.5;
+			p['data']['score'] -= 0.2;
 			return ['F', -1];
 		}
 	}
@@ -197,3 +197,63 @@ MathGame.prototype.stop = function() {
 };
 
 exports.MathGame = MathGame;
+
+
+var GeoGame = function() {
+	GameBase.call(this);
+	this.name = "Where is Wally?";
+	this.codename = "geo";
+	this.duration = 5000*60;
+};
+
+util.inherits(GeoGame, GameBase);
+
+GeoGame.prototype.getStartData = function(){
+	return {
+		score:0,
+		locations:[[{lat: 37.743186, lng: -122.462571},'sanfrancisco'],[{lat: 19.343259, lng: -99.121668},'mexicocity'],
+			[{lat: 50.845351, lng: 4.365525},'brussels'],[{lat:34.390706, lng: 132.461082},'hiroshima'],
+			[{lat: 31.7767379,lng: 35.228829},'jerusalem'],[{lat: 45.536997, lng: -73.602447},'montreal'],
+			[{lat: 41.4050628, lng: 2.1798117},'barcelona'],[{lat: 43.740081, lng: 7.421485},'monaco'],
+			[{lat: 55.6786931, lng: 12.5798913},'copenhagen'],[{lat: 32.7906444, lng: -96.83309},'dallas']
+		]
+	};
+};
+
+GeoGame.prototype.handle = function(email, input){
+	if(this.started)
+	{
+		var p = this.prehandle(email,input);
+		console.log(email, 'Input city',input,'Expected', p['data']['locations'][0][1]);
+		if(input === p['data']['locations'][0][1])
+		{
+			 p['data']['score'] += 1;
+			 p['data']['locations'].shift();
+			 return ['C', p['data']['locations'][0][0]]; //Continue
+		}
+		else
+		{
+			p['data']['score'] -= 0.1;
+			return ['F', -1];
+		}
+	}
+	return ['E', -1]; //Ended
+};
+
+GeoGame.prototype.stop = function() {
+	GameBase.prototype.stop.call(this);
+	this.players.sort(function(a,b){return b['data']['score'] - a['data']['score'];});
+	this.players = this.players.map(function(c,i){c['score'] = Math.max(1,10-i); return c;});
+	final_score =  this.players.map(function(p){
+		return {email: p.email, score: p.data['score']};
+	});
+	final_score.sort(function(a,b){return a['score'] - b['score'];});
+	var gamescore = new GameScore();
+	gamescore.name = this.name;
+	gamescore.codename = this.codename;
+	gamescore.scores = final_score;
+	gamescore.save();
+	return gamescore;
+};
+
+exports.GeoGame = GeoGame;
