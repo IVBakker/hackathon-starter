@@ -15,7 +15,8 @@ function gameTest(req, res){
 //	var this_game = new games.PressGame();
 //	var this_game = new games.MathGame();
 //	var this_game = new games.GeoGame();
-	var this_game = new games.MazeGame();
+//	var this_game = new games.MazeGame();
+	var this_game = new games.LoremGame();
 	res.render('gametest', {
 		title: 'Admin Test Room',
 		html: this_game.getHTML(),

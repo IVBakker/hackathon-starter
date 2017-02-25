@@ -4,7 +4,7 @@ onAnswer = function(status, direction)
 	if(status === 'F')
 	{
 		$('#THECALCALERT').show();
-		setTimeout(function(){$('#THECALCALERT').hide();},1000);
+		setTimeout(function(){$('#THECALCALERT').hide();},500);
 		gate_color='danger';
 	}
 	var button = $('#THECONTENTLEFTBUTTON');

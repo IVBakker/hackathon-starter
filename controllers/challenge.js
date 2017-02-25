@@ -13,8 +13,9 @@ function GameEngine(_io)
 		that.io = _io;
 //		that.games = [new games.MathGame(),
 //		new games.PressGame(),
+//		new games.MazeGame(),
 //		new games.GeoGame()];
-		that.games = [new games.MazeGame()];
+		that.games = [new games.LoremGame(), new games.PressGame()];
 		that.game = null;
 		that.state = 'PLAY'; //SCORE, PREPARE, PLAY
 		that.lastgamescores = null;
