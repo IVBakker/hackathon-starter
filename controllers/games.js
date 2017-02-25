@@ -493,3 +493,84 @@ DanceGame.prototype.stop = function() {
 };
 
 exports.DanceGame = DanceGame;
+
+var TimerGame = function() {
+	GameBase.call(this);
+	this.name = "Time me";
+	this.codename = "timer";
+	this.duration = 3000*60;
+};
+
+util.inherits(TimerGame, GameBase);
+
+TimerGame.prototype.getStartData = function(){
+	return {
+		best_timing:0,
+		cur_start:null
+	};
+};
+
+TimerGame.prototype.handle = function(email, input){
+	if(this.started)
+	{
+		var p = this.prehandle(email,input);
+		console.log(email, 'Cur start',p['data']['cur_start']);
+		if(p['data']['cur_start'] === null)
+		{
+			//player starting
+			p['data']['cur_start'] = new Date();
+			
+			return ['C',-1]; //Continue
+		}
+		else
+		{
+			//player stopping
+			var now = new Date();
+			var timing = now.getTime()-p['data']['cur_start'].getTime();
+			p['data']['cur_start'] = null;
+			if(timing > 10000)
+				return ['F', -1];
+			else
+			{
+				if( timing > p['data']['best_timing'])
+				{
+					p['data']['best_timing'] = timing;
+				}
+				return ['C', timing];
+			}
+		}
+	}
+	return ['E', -1]; //Ended
+};
+
+TimerGame.prototype.stop = function() {
+	GameBase.prototype.stop.call(this);
+	this.players.sort(function(a,b){return b['data']['best_timing'] - a['data']['best_timing'];});
+	var cur_gamescore = null;
+	var cur_rewardscore = 10;
+	for(var i=0;i<this.players.length;++i)
+	{
+		var cur_player = this.players[i];
+		if(cur_gamescore!== null && cur_player['data']['best_timing'] !== cur_gamescore)
+		{
+			--cur_rewardscore;
+		}
+		if(cur_rewardscore === 1)
+			break;
+		cur_gamescore = cur_player['data']['best_timing'];
+		
+		cur_player['score'] = cur_rewardscore;
+	}
+	final_score =  this.players.map(function(p){
+		return {email: p.email, score: p.data['best_timing']};
+	});
+	final_score.sort(function(a,b){return b['score'] - a['score'];});
+	var gamescore = new GameScore();
+	gamescore.name = this.name;
+	gamescore.codename = this.codename;
+	gamescore.scores = final_score;
+	gamescore.save();
+	return gamescore;
+};
+
+exports.TimerGame = TimerGame;

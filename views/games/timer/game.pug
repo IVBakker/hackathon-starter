@@ -1,0 +1,10 @@
+h1 Are you wasting time?
+row
+	.col-sm-10.text-center
+		#THETIMERBUTTON.btn-group(data-toggle='buttons')
+			button#THECONTENTTIMERBUTTON.btn.btn-default.btn-lg.center-block(style='width:300px; height:300px;font-size:45px;') Start
+	.col-sm-2.text-center
+		.alert.alert-info Last try:
+			span#THETIMERINFO None
+	.col-sm-12.text-center
+		#THETIMERALERT.alert.alert-danger(style="display: none;") You went over 10sec!
