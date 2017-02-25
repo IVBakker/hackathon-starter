@@ -565,6 +565,7 @@ TimerGame.prototype.stop = function() {
 		return {email: p.email, score: p.data['best_timing']};
 	});
 	final_score.sort(function(a,b){return b['score'] - a['score'];});
+	final_score.forEach(function(s){s['score']=s['score'].toString().toString().slice(0,-3)+','+s['score'].toString().toString().slice(-3);});
 	var gamescore = new GameScore();
 	gamescore.name = this.name;
 	gamescore.codename = this.codename;

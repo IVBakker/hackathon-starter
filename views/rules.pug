@@ -10,8 +10,16 @@ block content
 		dt When?
 		dd Every day you will be challenged to complete 2 games. One at 12:00 and one at 17:00 (sharp)
 		dt Who?
-		dd The rule of the mini-game will be visible one hour before the start of the mini-game. Games are based on agility or strength or intelligence. No general knowledge required
+		dd The rule of the mini-game will be visible one hour before the start of the mini-game. Games are based on agility or strength or intelligence
 		dt Where?
-		dd You need to be on the #[a(href="/competition") competition page] at 12:00 and 17:00. The mini-game will automatically load. You can't arrive late. Reloading during the game will kick you out of the game. Make sure to accept notifications to be alerted before a game starts. To accept notifications click #[a.notification_request(style="cursor:pointer") HERE]
+		dd You need to be on the #[a(href="/competition") competition page] at 12:00 and 17:00. The mini-game will automatically load. You can't arrive late. Reloading during the game will kick you out of the game. Make sure to accept notifications to be alerted before a game starts. To accept notifications click #[a.notification_request(style="cursor:pointer") HERE]. If you really don't want to miss a game, please allow to play a siren sound when a game starts: 
+			form
+				form
+					label.radio-inline
+						input#alertoff(type='radio', name='alertplay' checked)
+						| Off
+					label.radio-inline
+						input#alerton(type='radio', name='alertplay')
+						| On
 		dt Which?
 		dd Once again don't try to cheat. I have an admin interface this time.
