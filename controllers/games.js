@@ -565,7 +565,7 @@ TimerGame.prototype.stop = function() {
 		return {email: p.email, score: p.data['best_timing']};
 	});
 	final_score.sort(function(a,b){return b['score'] - a['score'];});
-	final_score.forEach(function(s){s['score']=s['score'].toString().toString().slice(0,-3)+','+s['score'].toString().toString().slice(-3);});
+	final_score.forEach(function(s){s['score']=s['score'].toString().slice(0,-3)+','+s['score'].toString().slice(-3);});
 	var gamescore = new GameScore();
 	gamescore.name = this.name;
 	gamescore.codename = this.codename;
@@ -690,7 +690,7 @@ ClimbingGame.prototype.handle = function(email, input){
 
 ClimbingGame.prototype.stop = function() {
 	GameBase.prototype.stop.call(this);
-	this.players.sort(function(a,b){return a['data']['time'] - a['data']['time'];});
+	this.players.sort(function(a,b){return a['data']['time'] - b['data']['time'];});
 	var cur_gamescore = null;
 	var cur_rewardscore = 10;
 	for(var i=0;i<this.players.length;++i)
@@ -710,7 +710,7 @@ ClimbingGame.prototype.stop = function() {
 		return {email: p.email, score: p.data['time']};
 	});
 	final_score.sort(function(a,b){return b['score'] - a['score'];});
-	final_score.forEach(function(s){s['score']=s['score'].toString().toString().slice(0,-3)+','+s['score'].toString().toString().slice(-3);});
+	final_score.forEach(function(s){s['score']=s['score'].toString().slice(0,-3)+','+s['score'].toString().slice(-3);});
 	var gamescore = new GameScore();
 	gamescore.name = this.name;
 	gamescore.codename = this.codename;
@@ -720,3 +720,78 @@ ClimbingGame.prototype.stop = function() {
 };
 
 exports.ClimbingGame = ClimbingGame;
+
+var ReactionGame = function() {
+	GameBase.call(this);
+	this.name = "Boo";
+	this.codename = "reaction";
+	this.duration = 3000*60;
+};
+
+util.inherits(ReactionGame, GameBase);
+
+ReactionGame.prototype.getStartData = function(){
+	return {
+		delays:[5,7,7,3,7,4,9,10,8,4,3,9,4,4,9,5,4,7,4,10,5,9,6,10,5,6,8,10,4,9,9,7,6,9,4,6,5,9,4,5,3,8,9,6,5,10,9,9,9,4,9,6,8,9,7,4,5,7,8,3,7,4,3,8,5,9,6,4,5,3,10,5,3,3,10,7,3,7,7,6,3,9,7,9,6,4,5,3,4,3,5,7,8,9,10,3,3,9,3,10],
+		bestreaction:3000*60,
+		startreaction:null
+	};
+};
+
+ReactionGame.prototype.handle = function(email, input){
+	if(this.started)
+	{
+		var p = this.prehandle(email,input);
+		if(p['data']['startreaction'] === null && input === 'START')
+		{
+			p['data']['startreaction'] = new Date();
+			return ['C', -1];
+		}
+		else if(input === 'STOP')
+		{
+			var now = new Date();
+			var reaction_time = now.getTime()-p['data']['startreaction'].getTime();
+			if (reaction_time < p['data']['bestreaction'])
+				p['data']['bestreaction'] = reaction_time;
+			p['data']['startreaction'] = null;
+			p['data']['delays'].shift();
+			
+			return ['C', [reaction_time, p['data']['delays'][0]]];
+		}
+		return ['F', -1];
+	}
+	return ['E', -1]; //Ended
+};
+
+ReactionGame.prototype.stop = function() {
+	GameBase.prototype.stop.call(this);
+	this.players.sort(function(a,b){return a['data']['bestreaction'] - b['data']['bestreaction'];});
+	var cur_gamescore = null;
+	var cur_rewardscore = 10;
+	for(var i=0;i<this.players.length;++i)
+	{
+		var cur_player = this.players[i];
+		if(cur_gamescore!== null && cur_player['data']['bestreaction'] !== cur_gamescore)
+		{
+			--cur_rewardscore;
+		}
+		if(cur_rewardscore === 1)
+			break;
+		cur_gamescore = cur_player['data']['bestreaction'];
+		
+		cur_player['score'] = cur_rewardscore;
+	}
+	final_score =  this.players.map(function(p){
+		return {email: p.email, score: p.data['bestreaction']};
+	});
+	final_score.sort(function(a,b){return b['score'] - a['score'];});
+	final_score.forEach(function(s){s['score']=s['score']+'ms';});
+	var gamescore = new GameScore();
+	gamescore.name = this.name;
+	gamescore.codename = this.codename;
+	gamescore.scores = final_score;
+	gamescore.save();
+	return gamescore;
+};
+
+exports.ReactionGame = ReactionGame;

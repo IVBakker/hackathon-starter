@@ -6,7 +6,7 @@ Agilite
 
 Force
 +-= Appuyer sur une touche le plus de fois possible en 1min
-- Tout le monde est attribue une lettre, le but etant d'arriver a toucher le plus de personne avec des attaques de lettres. Pour lancer une attaque il suffit d'appuyer sur la lettre de la personne en minuscule. La personne attaque recoit la lettre de l'attaquant en Majuscule. Attaquer ne peut envoyer qu'une lettre toutes les 0.2s. Lorsqu'on recoit une lettre on a une seconde pour l'enlever. On se defend avec majuscule + la lettre. Le status de vie est en forme de roue de 26 lettres
+- ReactionTime
 +- climbing
 
 Intelligence
