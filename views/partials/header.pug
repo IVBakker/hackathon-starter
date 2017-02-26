@@ -13,11 +13,13 @@
 			ul.nav.navbar-nav
 				li(class=(title == 'Home') ? 'active' : undefined)
 					a(href='/') Home
-				if user
 				li
 					a(href='/rules') Rules
-						li
-								a(href='/competition') Competition
+				if user
+					li
+						a(href='/competition') Competition
+				li
+					a(href='/about') About
 				if user && user.admin
 						li
 								a(href='/Admin', style='color:red') Admin
