@@ -11,14 +11,17 @@ function GameEngine(_io)
 {
 		var that = this;
 		that.io = _io;
-//		that.games = [new games.MathGame(),
-//		new games.PressGame(),
-//		new games.MazeGame(),
+//		that.games = [new games.MathGame(), //Monday
 //		new games.LoremGame(),
+//		new games.MazeGame(), //Tuesday
 //		new games.DanceGame(),
-//		new games.CircleGame(),
-//		new games.GeoGame()];
-		that.games = [new games.CircleGame(), new games.LoremGame()];
+//		new games.GeoGame(), //Wednesday
+//		new games.ClimbingGame(),
+//		new games.PressGame(), //Thursday
+//		new games.TimerGame(), 
+//		new games.CircleGame(), //Friday
+//		];
+		that.games = [new games.ClimbingGame(), new games.LoremGame()];
 		that.game = null;
 		that.state = 'PLAY'; //SCORE, PREPARE, PLAY
 		that.lastgamescores = null;

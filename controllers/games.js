@@ -642,3 +642,81 @@ CircleGame.prototype.stop = function() {
 };
 
 exports.CircleGame = CircleGame;
+
+var ClimbingGame = function() {
+	GameBase.call(this);
+	this.name = "Reach for the top";
+	this.codename = "climbing";
+	this.duration = 5000*60;
+};
+
+util.inherits(ClimbingGame, GameBase);
+
+ClimbingGame.prototype.getStartData = function(){
+	return {
+		time:5000*60,
+		lastinput:null,
+		height:0
+	};
+};
+
+ClimbingGame.prototype.handle = function(email, input){
+	if(this.started)
+	{
+		var p = this.prehandle(email,input);
+		if(p['data']['lastinput'] === null ||
+						(input === 'L' && p['data']['lastinput'] === 'R') || (input === 'R' && p['data']['lastinput'] === 'L'))
+		{
+			p['data']['lastinput'] = input;
+			p['data']['height'] +=1;
+			if(p['data']['height'] >= 661)
+			{
+				var now = new Date();
+				p['data']['time'] = now.getTime()-this.start_time.getTime();
+				return ['E', -1];
+			}
+			return ['C', p['data']['height']];
+		}
+		else
+		{
+			//FAIL
+			p['data']['lastinput'] = null;
+			p['data']['height'] = 0;
+			return ['F', 0];
+		}
+	}
+	return ['E', -1]; //Ended
+};
+
+ClimbingGame.prototype.stop = function() {
+	GameBase.prototype.stop.call(this);
+	this.players.sort(function(a,b){return a['data']['time'] - a['data']['time'];});
+	var cur_gamescore = null;
+	var cur_rewardscore = 10;
+	for(var i=0;i<this.players.length;++i)
+	{
+		var cur_player = this.players[i];
+		if(cur_gamescore!== null && cur_player['data']['time'] !== cur_gamescore)
+		{
+			--cur_rewardscore;
+		}
+		if(cur_rewardscore === 1)
+			break;
+		cur_gamescore = cur_player['data']['time'];
+		
+		cur_player['score'] = cur_rewardscore;
+	}
+	final_score =  this.players.map(function(p){
+		return {email: p.email, score: p.data['time']};
+	});
+	final_score.sort(function(a,b){return b['score'] - a['score'];});
+	final_score.forEach(function(s){s['score']=s['score'].toString().toString().slice(0,-3)+','+s['score'].toString().toString().slice(-3);});
+	var gamescore = new GameScore();
+	gamescore.name = this.name;
+	gamescore.codename = this.codename;
+	gamescore.scores = final_score;
+	gamescore.save();
+	return gamescore;
+};
+
+exports.ClimbingGame = ClimbingGame;
