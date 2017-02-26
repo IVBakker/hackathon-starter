@@ -2,7 +2,7 @@ Agilite
 -= Touches (haut-bas-gauche-droite) a consommer dans l'ordre le plus rapidement
 -= Lorem Ipsum a re-ecrire le plus vite possible
 - Cercles de clic dans un espace de plus en plus petit (avec un minima) qui ne cessent de bouger. Le but etant de cliquer sur le plus de cercles en 1min
-- Une minute pour arriver a appuyer sur une touche start puis appuyer sur la touche stop le plus pres des 10sec sans depasser.
+-= Une minute pour arriver a appuyer sur une touche start puis appuyer sur la touche stop le plus pres des 10sec sans depasser.
 
 Force
 -= Appuyer sur une touche le plus de fois possible en 1min
