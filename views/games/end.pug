@@ -1,5 +1,7 @@
 h1 End
 .row
+	h1 Congratulation #{engine.scoreboard[0].username} (#{engine.scoreboard[0].email})
+.row
 	table.table.table-condensed
 		thead
 			tr
@@ -12,3 +14,16 @@ h1 End
 							td= user.email
 							td= user.username
 							td= user.score
+if engine.lastgamescores !== null
+	.row
+		h1 Last Game Score: !{engine.lastgamescores.name}
+		table.table.table-condensed
+			thead
+				tr
+					th Email
+					th Game Score
+			tbody
+					each user in engine.lastgamescores.scores
+							tr
+								td= user.email
+								td= user.score

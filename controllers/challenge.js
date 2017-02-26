@@ -11,18 +11,19 @@ function GameEngine(_io)
 {
 		var that = this;
 		that.io = _io;
-//		that.games = [new games.MazeGame(), //Monday
-//		new games.LoremGame(),
-//		new games.GeoGame(), //Tuesday
-//		new games.DanceGame(),
-//		new games.MathGame(), //Wednesday
-//		new games.ClimbingGame(),
-//		new games.PressGame(), //Thursday
-//		new games.TimerGame(), 
-//		new games.CircleGame(), //Friday
-//		new games.ReactionGame(),
-//		];
-		that.games = [new games.ReactionGame(), new games.LoremGame()];
+		that.games = [
+			new games.LoremGame(), //Monday
+			new games.MazeGame(),
+			new games.GeoGame(), //Tuesday
+			new games.DanceGame(),
+			new games.MathGame(), //Wednesday
+			new games.ClimbingGame(),
+			new games.PressGame(), //Thursday
+			new games.TimerGame(), 
+			new games.CircleGame(), //Friday
+			new games.ReactionGame(),
+		];
+//		that.games = [new games.ReactionGame(), new games.LoremGame()];
 		that.game = null;
 		that.state = 'PLAY'; //SCORE, PREPARE, PLAY
 		that.lastgamescores = null;
