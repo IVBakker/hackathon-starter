@@ -226,7 +226,7 @@ GeoGame.prototype.getStartData = function(){
 	return {
 		score:0,
 		locations:[[{lat: 37.743186, lng: -122.462571},'sanfrancisco'],[{lat: 19.343259, lng: -99.121668},'mexicocity'],
-			[{lat: 50.845351, lng: 4.365525},'brussels'],[{lat:34.390706, lng: 132.461082},'hiroshima'],
+			[{lat: 50.884083, lng: 4.342396},'brussels'],[{lat:34.390706, lng: 132.461082},'hiroshima'],
 			[{lat: 31.7767379,lng: 35.228829},'jerusalem'],[{lat: 45.536997, lng: -73.602447},'montreal'],
 			[{lat: 41.4050628, lng: 2.1798117},'barcelona'],[{lat: 43.740081, lng: 7.421485},'monaco'],
 			[{lat: 55.6786931, lng: 12.5798913},'copenhagen'],[{lat: 32.7906444, lng: -96.83309},'dallas']
