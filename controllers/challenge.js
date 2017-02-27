@@ -213,7 +213,7 @@ exports.setIo = function(io, sessionstore)
 				socket.on('chat message', function(msg)
 				{
 //					console.log("Message received", msg);
-					socket.broadcast.emit('chat message', {'user':socket.request.user.username,'msg':escape(msg)});
+					socket.broadcast.emit('chat message', {'user':escape(socket.request.user.username),'pic':escape(socket.request.user.picture),'msg':escape(msg)});
 				});
 				socket.on('input', function(input)
 				{

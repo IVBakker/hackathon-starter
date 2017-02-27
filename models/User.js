@@ -94,6 +94,15 @@ userSchema.methods.gravatar = function gravatar(size) {
   return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
 };
 
+userSchema.virtual('picture').get(function() {
+	var src_image = '';
+	if (this.profile && this.profile.picture)
+		src_image = this.profile.picture;
+	else
+		src_image = this.gravatar(60);
+  return src_image;
+});
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;

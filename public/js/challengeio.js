@@ -22,8 +22,8 @@ $(document).ready(function()
 																				</div>\
 																</div>\
 																<div class='col-md-2 col-xs-2 avatar'>\
-																				<img src='http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg'\
-																								 class=' img-responsive '>\
+																				<img src='"+$('#PROFILEPIC').attr('src')+"'\
+																								 class=' img-responsive'>\
 																</div>\
 												</div>";
 						console.log("Sending", msg);
@@ -49,12 +49,12 @@ $(document).ready(function()
 						var received_msg = "\
 										<div class='row msg_container base_receive'> \
 														<div class='col-md-2 col-xs-2 avatar'>\
-																		<img src='http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg'\
+																		<img src='"+data.pic+"'\
 																						 class=' img-responsive '>\
 														</div>\
 														<div class='col-md-10 col-xs-10'>\
 																		<div class='messages msg_receive'>\
-																						<p>"+escapeHtml(data.msg)+"</p>\
+																						<p>"+data.msg+"</p>\
 																						<time>"+(new Date()).toLocaleString()+" - "+data.user+"</time>\
 																		</div>\
 														</div>\
