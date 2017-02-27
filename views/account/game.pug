@@ -1,0 +1,20 @@
+extends ../layout
+
+block content
+	.page-header
+		h3 Global Score
+		.row
+			.col-md-12.text-center 
+				h1 !{score.score}
+	.page-header
+		h3 Game Information:
+	table.table.table-condensed
+		thead
+			tr
+				th Game
+				th Score
+		tbody
+				each s in score.scores
+						tr
+							td= s.game
+							td= s.score

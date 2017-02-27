@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const passport = require('passport');
 const User = require('../models/User');
+const Score = require('../models/Score');
 
 /**
  * GET /login
@@ -373,3 +374,15 @@ exports.postForgot = (req, res, next) => {
 		res.redirect('/forgot');
 	});
 };
+
+exports.getGameProfile = function(req, res, next)
+{
+	//req.user
+	Score.findOne({email:req.user.email},{},function(err,score){
+		res.render('account/game', {
+			title: 'Game Profile',
+			score: score
+		});
+	})
+	
+}
