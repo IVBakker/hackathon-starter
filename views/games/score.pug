@@ -8,11 +8,12 @@ include countdown
 				th User
 				th Score
 		tbody
-				each user in engine.scoreboard
-						tr
-							td= user.email
-							td= user.username
-							td= user.score
+			each user in engine.scoreboard
+				if user.score > 0
+					tr
+						td= user.email
+						td= user.username
+						td= user.score
 
 if engine.lastgamescores !== null
 	.row

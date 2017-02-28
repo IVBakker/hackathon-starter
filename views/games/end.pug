@@ -10,6 +10,7 @@ h1 End
 				th Score
 		tbody
 				each user in engine.scoreboard
+					if user.score > 0
 						tr
 							td= user.email
 							td= user.username
