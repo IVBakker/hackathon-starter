@@ -50,7 +50,7 @@ function GameEngine(_io)
 			{
 //				console.log("GAME", that.game);
 				var answer = that.game.handle(email, input);
-				console.log('INPUT:', input, 'ANSWER:', answer);
+				console.log(email, 'INPUT:', input, 'ANSWER:', answer);
 				if (['C','E','F'].indexOf(answer[0]) !== -1)
 				{
 					socket.emit('answer', answer);
@@ -119,7 +119,8 @@ function GameEngine(_io)
 					{
 						//Stop the game if necessary
 						console.log("END of game", that.game.name);
-						that.lastgamescores = that.game.stop();
+						that.game.stop();
+						that.lastgamescores = that.game.save();
 						var game_name = that.game.name;
 						var player_results = that.game.players;
 						var nplayer_results = player_results.length;

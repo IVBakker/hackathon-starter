@@ -10,8 +10,10 @@ var GameBase = function() {
 	this.players = [];
 	this.duration = 1000*5*60;
 	this.started = false;
+	this.played = false;
 	this.start_time = null;
 	this.playerfinished = 0;
+	this.final_score = null;
 };
 
 GameBase.prototype.start = function() {
@@ -22,7 +24,23 @@ GameBase.prototype.start = function() {
 
 GameBase.prototype.stop = function() {
 	this.started = false;
+	this.played = true;
 };
+
+GameBase.prototype.save = function()
+{
+	if(this.played && this.final_score !== null)
+	{
+		var gamescore = new GameScore();
+		gamescore.name = this.name;
+		gamescore.codename = this.codename;
+		gamescore.scores = this.final_score;
+		gamescore.save();
+		return gamescore;
+	}
+	return null;
+};
+
 
 GameBase.prototype.getStartData = function(){
 	return null;
@@ -31,11 +49,6 @@ GameBase.prototype.getStartData = function(){
 GameBase.prototype.handle = function(){
 	//TO OVERWRITE
 	throw new Error('HANDLE FUNCTION TO OVERWRITE');
-};
-
-GameBase.prototype.getFinalScore = function(){
-	//TO OVERWRITE
-	throw new Error('FINAL SCORE FUNCTION TO OVERWRITE');
 };
 
 GameBase.prototype.prehandle = function(email, input){
@@ -122,17 +135,9 @@ PressGame.prototype.stop = function() {
 		cur_player['score'] = cur_rewardscore;
 	}
 	
-	final_score =  this.players.map(function(p){
+	this.final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data};
 	});
-	final_score.sort(function(a,b){return b['score'] - a['score'];});
-	var gamescore = new GameScore();
-	gamescore.name = this.name;
-	gamescore.codename = this.codename;
-	gamescore.scores = final_score;
-	gamescore.save();
-	return gamescore;
-//	console.log("Players finish state:", this.players);
 };
 
 exports.PressGame = PressGame;
@@ -198,15 +203,9 @@ MathGame.prototype.stop = function() {
 		
 		cur_player['score'] = cur_rewardscore;
 	}
-	final_score =  this.players.map(function(p){
+	this.final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['score']};
 	});
-	var gamescore = new GameScore();
-	gamescore.name = this.name;
-	gamescore.codename = this.codename;
-	gamescore.scores = final_score;
-	gamescore.save();
-	return gamescore;
 };
 
 exports.MathGame = MathGame;
@@ -272,7 +271,7 @@ GeoGame.prototype.stop = function() {
 		cur_player['score'] = cur_rewardscore;
 	}
 	
-	final_score =  this.players.map(function(p){
+	this.final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['score']};
 	});
 	var gamescore = new GameScore();
@@ -341,15 +340,9 @@ MazeGame.prototype.stop = function() {
 		
 		cur_player['score'] = cur_rewardscore;
 	}
-	final_score =  this.players.map(function(p){
+	this.final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['deep']};
 	});
-	var gamescore = new GameScore();
-	gamescore.name = this.name;
-	gamescore.codename = this.codename;
-	gamescore.scores = final_score;
-	gamescore.save();
-	return gamescore;
 };
 
 exports.MazeGame = MazeGame;
@@ -409,15 +402,9 @@ LoremGame.prototype.stop = function() {
 		
 		cur_player['score'] = cur_rewardscore;
 	}
-	final_score =  this.players.map(function(p){
+	this.final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['score']};
 	});
-	var gamescore = new GameScore();
-	gamescore.name = this.name;
-	gamescore.codename = this.codename;
-	gamescore.scores = final_score;
-	gamescore.save();
-	return gamescore;
 };
 
 exports.LoremGame = LoremGame;
@@ -477,15 +464,9 @@ DanceGame.prototype.stop = function() {
 		
 		cur_player['score'] = cur_rewardscore;
 	}
-	final_score =  this.players.map(function(p){
+	this.final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['score']};
 	});
-	var gamescore = new GameScore();
-	gamescore.name = this.name;
-	gamescore.codename = this.codename;
-	gamescore.scores = final_score;
-	gamescore.save();
-	return gamescore;
 };
 
 exports.DanceGame = DanceGame;
@@ -557,16 +538,10 @@ TimerGame.prototype.stop = function() {
 		
 		cur_player['score'] = cur_rewardscore;
 	}
-	final_score =  this.players.map(function(p){
+	this.final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['best_timing']};
 	});
-	final_score.forEach(function(s){s['score']=s['score'].toString().slice(0,-3)+','+s['score'].toString().slice(-3);});
-	var gamescore = new GameScore();
-	gamescore.name = this.name;
-	gamescore.codename = this.codename;
-	gamescore.scores = final_score;
-	gamescore.save();
-	return gamescore;
+	this.final_score.forEach(function(s){s['score']=s['score'].toString().slice(0,-3)+','+s['score'].toString().slice(-3);});
 };
 
 exports.TimerGame = TimerGame;
@@ -624,16 +599,9 @@ CircleGame.prototype.stop = function() {
 		
 		cur_player['score'] = cur_rewardscore;
 	}
-	final_score =  this.players.map(function(p){
+	this.final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['score']};
 	});
-	final_score.sort(function(a,b){return b['score'] - a['score'];});
-	var gamescore = new GameScore();
-	gamescore.name = this.name;
-	gamescore.codename = this.codename;
-	gamescore.scores = final_score;
-	gamescore.save();
-	return gamescore;
 };
 
 exports.CircleGame = CircleGame;
@@ -701,16 +669,10 @@ ClimbingGame.prototype.stop = function() {
 		
 		cur_player['score'] = cur_rewardscore;
 	}
-	final_score =  this.players.map(function(p){
+	this.final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['time']};
 	});
-	final_score.forEach(function(s){s['score']=s['score'].toString().slice(0,-3)+','+s['score'].toString().slice(-3);});
-	var gamescore = new GameScore();
-	gamescore.name = this.name;
-	gamescore.codename = this.codename;
-	gamescore.scores = final_score;
-	gamescore.save();
-	return gamescore;
+	this.final_score.forEach(function(s){s['score']=s['score'].toString().slice(0,-3)+','+s['score'].toString().slice(-3);});
 };
 
 exports.ClimbingGame = ClimbingGame;
@@ -775,16 +737,10 @@ ReactionGame.prototype.stop = function() {
 		
 		cur_player['score'] = cur_rewardscore;
 	}
-	final_score =  this.players.map(function(p){
+	this.final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['bestreaction']};
 	});
-	final_score.forEach(function(s){s['score']=s['score']+'ms';});
-	var gamescore = new GameScore();
-	gamescore.name = this.name;
-	gamescore.codename = this.codename;
-	gamescore.scores = final_score;
-	gamescore.save();
-	return gamescore;
+	this.final_score.forEach(function(s){s['score']=s['score']+'ms';});
 };
 
 exports.ReactionGame = ReactionGame;
