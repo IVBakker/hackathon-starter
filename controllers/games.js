@@ -274,12 +274,6 @@ GeoGame.prototype.stop = function() {
 	this.final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['score']};
 	});
-	var gamescore = new GameScore();
-	gamescore.name = this.name;
-	gamescore.codename = this.codename;
-	gamescore.scores = final_score;
-	gamescore.save();
-	return gamescore;
 };
 
 exports.GeoGame = GeoGame;
