@@ -46,6 +46,7 @@ $(document).ready(function()
 		
 		socket.on('chat message', function(data)
 		{
+			$("#favicon").attr("href","favicon_notification.ico");
 						var received_msg = "\
 										<div class='row msg_container base_receive'> \
 														<div class='col-md-2 col-xs-2 avatar'>\
@@ -61,6 +62,11 @@ $(document).ready(function()
 										</div>";
 				$('.msg_container_base').append(received_msg);
 				$(".msg_container_base").animate({ scrollTop: $(".msg_container_base")[0].scrollHeight }, "slow");
+		});
+
+		$(window).on('focus', function()
+		{
+			$("#favicon").attr("href","favicon.ico");
 		});
 
 		$('.panel-heading span.minim_chat').on('click', function (e) {
@@ -123,8 +129,9 @@ $(document).ready(function()
 			{
 				if (data[0] === 'E')
 				{
+					STATE = 'OUTPLAY'
 					$("#gamecontainer").fadeOut("slow", function(){
-						$("#gamecontainer").html('<h1>You finished the game, waiting for game to finish</h1>');
+						$("#gamecontainer").html('<h1>You finished the game, waiting for it to finish</h1>');
 						$("#gamecontainer").fadeIn("slow");
 					});
 				}

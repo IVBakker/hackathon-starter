@@ -186,7 +186,6 @@ function GameEngine(_io)
 			if(score)
 			{
 				console.log("Last game score found:", score.name);
-				score.scores.sort(function(a,b){return b.score-a.score;});
 				that.lastgamescores = score;
 			}
 		});

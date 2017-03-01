@@ -149,11 +149,11 @@ util.inherits(MathGame, GameBase);
 MathGame.prototype.getStartData = function(){
 	return {
 		score:0,
-		problems:[['1+1',2],['7+8*3',31],['21-17+5',9],['12*11',132],['99/9',11],['4*3+2*6*1',24],['10*18*3+2',542],['5*7*9-77',238],['23-9*6+465',549],['123-46',77],
+		problems:[['1+1',2],['7+8*3',31],['21-17+5',9],['12*11',132],['99/9',11],['4*3+2*6*1',24],['10*18*3+2',542],['5*7*9-77',238],['(23-9)*6+465',549],['123-46',77],
 		['3*(4+6+23)',99],['147 + 680',827],['23*7',161],['53*12',636],['101-9-8-7-6-5',66],
-		['45*5+25',250],['21+34-33+1',23],['(65+23)/8',11],['123+456',579],['900-100-100-50-25-4',624],['78*9',702],
+		['45*5+25',250],['21+34-33+1',23],['(65+23)/8',11],['123+456',579],['900-100-100-50-25-4',621],['78*9',702],
 		['10/10+40+92',133],['8*5*60',2400],['2+3+4+5+6+8',28],['9*100-72',828],
-		['725/5',145],['100+10*1',110],['3+1+4+1+5+9+2+6+5+3+5',44],['8+97+9+(3*2)',120],['26*4+33+8',145],['(50*2+8)*4',438],['6+93+99',198],
+		['725/5',145],['100+10*1',110],['3+1+4+1+5+9+2+6+5+3+5',44],['8+97+9+(3*2)',120],['26*4+33+8',145],['(50*2+8)*4',432],['6+93+99',198],
 		['58*20',1160],['(5+9)*2-3',25],['62+62+62',186],['(86+14)*(34+66)',10000],['3421170679',3421170679],['19+71+71-38',123],
 		['(14+21)/5+7',14],['43-86+124',81],['98*8',784],['95*4+4',384],['66*10-87',573]
 		]
@@ -164,7 +164,7 @@ MathGame.prototype.handle = function(email, input){
 	if(this.started)
 	{
 		var p = this.prehandle(email,input);
-		console.log('Input math',input,'Expected', p['data']['problems'][0]);
+		console.log(email, 'Input math',input,'Expected', p['data']['problems'][0]);
 		if(input === p['data']['problems'][0][1])
 		{
 			 p['data']['score'] += 1;
@@ -201,7 +201,6 @@ MathGame.prototype.stop = function() {
 	final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['score']};
 	});
-	final_score.sort(function(a,b){return b['score'] - a['score'];});
 	var gamescore = new GameScore();
 	gamescore.name = this.name;
 	gamescore.codename = this.codename;
@@ -276,7 +275,6 @@ GeoGame.prototype.stop = function() {
 	final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['score']};
 	});
-	final_score.sort(function(a,b){return b['score'] - a['score'];});
 	var gamescore = new GameScore();
 	gamescore.name = this.name;
 	gamescore.codename = this.codename;
@@ -346,7 +344,6 @@ MazeGame.prototype.stop = function() {
 	final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['deep']};
 	});
-	final_score.sort(function(a,b){return b['score'] - a['score'];});
 	var gamescore = new GameScore();
 	gamescore.name = this.name;
 	gamescore.codename = this.codename;
@@ -415,7 +412,6 @@ LoremGame.prototype.stop = function() {
 	final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['score']};
 	});
-	final_score.sort(function(a,b){return b['score'] - a['score'];});
 	var gamescore = new GameScore();
 	gamescore.name = this.name;
 	gamescore.codename = this.codename;
@@ -484,7 +480,6 @@ DanceGame.prototype.stop = function() {
 	final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['score']};
 	});
-	final_score.sort(function(a,b){return b['score'] - a['score'];});
 	var gamescore = new GameScore();
 	gamescore.name = this.name;
 	gamescore.codename = this.codename;
@@ -565,7 +560,6 @@ TimerGame.prototype.stop = function() {
 	final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['best_timing']};
 	});
-	final_score.sort(function(a,b){return b['score'] - a['score'];});
 	final_score.forEach(function(s){s['score']=s['score'].toString().slice(0,-3)+','+s['score'].toString().slice(-3);});
 	var gamescore = new GameScore();
 	gamescore.name = this.name;
@@ -710,7 +704,6 @@ ClimbingGame.prototype.stop = function() {
 	final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['time']};
 	});
-	final_score.sort(function(a,b){return b['score'] - a['score'];});
 	final_score.forEach(function(s){s['score']=s['score'].toString().slice(0,-3)+','+s['score'].toString().slice(-3);});
 	var gamescore = new GameScore();
 	gamescore.name = this.name;
@@ -785,7 +778,6 @@ ReactionGame.prototype.stop = function() {
 	final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['bestreaction']};
 	});
-	final_score.sort(function(a,b){return b['score'] - a['score'];});
 	final_score.forEach(function(s){s['score']=s['score']+'ms';});
 	var gamescore = new GameScore();
 	gamescore.name = this.name;
