@@ -97,17 +97,19 @@ function GameEngine(_io)
 				{
 					that.state = 'PREPARE';
 					console.log("New STATE:", that.state);
+					console.log("PREPARE GAME:", that.game.name);
 					that.nextstatetime = nextGameDate();
-					that.io.sockets.emit('state', {state:that.state, html:that.renderState(),js:''});
+					that.io.emit('state', {state:that.state, html:that.renderState(),js:''});
 					break;
 				}
 				case 'PREPARE':
 				{
 					that.state = 'PLAY';
 					console.log("New STATE:", that.state);
+					console.log("PLAY GAME:", that.game.name);
 					var g_duration = that.game.start();
 					that.nextstatetime = new Date((new Date()).getTime() + g_duration);
-					that.io.sockets.emit('state', {state:that.state, name:that.game.name, html:that.game.getHTML(), js:that.game.getJS()});
+					that.io.emit('state', {state:that.state, name:that.game.name, html:that.game.getHTML(), js:that.game.getJS()});
 					break;
 				}
 				case 'PLAY':
@@ -140,7 +142,7 @@ function GameEngine(_io)
 								existingScore.save(function(){
 									if (i === nplayer_results-1)
 									{
-										that.updateScoreboard(function(){that.io.sockets.emit('state', {state:that.state, html:that.renderState(),js:''});});
+										that.updateScoreboard(function(){that.io.emit('state', {state:that.state, html:that.renderState(),js:''});});
 									}
 								});
 							});
@@ -181,8 +183,11 @@ function GameEngine(_io)
 				that.timeout = that.setTimeout(function(){console.log("Timeout next state over");that.nextState();}, waittime);
 			}
 		};
-
-		that.nextState();
+		games.getPlayedGames(function(played_games){
+				that.games = that.games.filter(function(g){return played_games.indexOf(g.codename) === -1});
+				that.nextState();
+			});
+		
 		GameScore.findOne({}, {}, { sort: { 'createdAt' : -1 } }, function(err, score) {
 			if(score)
 			{
@@ -200,28 +205,30 @@ var gameengine = null;
 
 exports.setIo = function(io, sessionstore)
 {
-		io.use(passportSocketIo.authorize({
-			secret: process.env.SESSION_SECRET, // the session_secret to parse the cookie
-			store: sessionstore, // we NEED to use a sessionstore. no memorystore please
-			success: onAuthorizeSuccess, // *optional* callback on success - read more below
-			fail: onAuthorizeFail // *optional* callback on fail/error - read more below
-		}));
-		
-		io.on('connection', function(socket)
-		{
-				console.log("New connection from ", socket.request.user.email);
-				socket.on('chat message', function(msg)
-				{
+	var nsp = io.of('/competition');
+	
+	nsp.use(passportSocketIo.authorize({
+		secret: process.env.SESSION_SECRET, // the session_secret to parse the cookie
+		store: sessionstore, // we NEED to use a sessionstore. no memorystore please
+		success: onAuthorizeSuccess, // *optional* callback on success - read more below
+		fail: onAuthorizeFail // *optional* callback on fail/error - read more below
+	}));
+
+	nsp.on('connection', function(socket)
+	{
+			console.log("New connection from ", socket.request.user.email);
+			socket.on('chat message', function(msg)
+			{
 //					console.log("Message received", msg);
-					socket.broadcast.emit('chat message', {'user':escape(socket.request.user.username),'pic':escape(socket.request.user.picture),'msg':escape(msg)});
-				});
-				socket.on('input', function(input)
-				{
-					gameengine.handle(socket,socket.request.user.email,input);
-				});
-		});
-		gameengine = GameEngine(io);
-		return gameengine;
+				socket.broadcast.emit('chat message', {'user':escape(socket.request.user.username),'pic':escape(socket.request.user.picture),'msg':escape(msg)});
+			});
+			socket.on('input', function(input)
+			{
+				gameengine.handle(socket,socket.request.user.email,input);
+			});
+	});
+	gameengine = GameEngine(nsp);
+	return gameengine;
 };
 
 exports.controller = function(req, res){

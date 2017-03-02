@@ -1,13 +1,10 @@
+var socket = null;
 $(document).ready(function()
 {
 	var STATE = null;
-		var socket_url = location.protocol + '//' + location.hostname + ':' + location.port+'/competition';
-		var socket = io(socket_url);
-		function escapeHtml(str) {
-				var div = document.createElement('div');
-				div.appendChild(document.createTextNode(str));
-				return div.innerHTML;
-		}
+		var socket_url = location.protocol + '//' + location.hostname + ':' + location.port+'/sandbox';
+		console.log("SOCKET", socket_url);
+		socket = io(socket_url);
 		function sendMessage()
 		{
 				var msg = $('#chat-input').val().trim();
@@ -91,16 +88,6 @@ $(document).ready(function()
 			
 			console.log('received:', data);
 			onAnswer = null;
-			if(STATE === 'PLAY')
-			{
-				new Notification("GG 2017", {body: "Game "+data.name+" has started!"});
-				if(getCookie('playalert') === 'Y')
-				{
-						$('#audioalert').trigger("play");
-				}
-			}
-			else if (STATE === 'PREPARE')
-				new Notification("GG 2017", {body: "New game rules have been announced!"});
 			$("#gamecontainer").fadeOut("slow", function()
 			{
 				$("#gamecontainer").css('visibility','visible');
@@ -116,6 +103,11 @@ $(document).ready(function()
 				location.reload();
 		});
 		
+		$('.game-create').click(function(){
+			console.log('CREATE', $(this).attr('codename'));
+			socket.emit('create', $(this).attr('codename'));
+		});
+		
 		function sendInput(input)
 		{
 			if(STATE === 'PLAY')
@@ -124,12 +116,11 @@ $(document).ready(function()
 		
 		socket.on('answer', function(data)
 		{
-//			console.log('ANSWER:', data);
 			if(onAnswer !== null)
 			{
 				if (data[0] === 'E')
 				{
-					STATE = 'OUTPLAY'
+					STATE = 'OUTPLAY';
 					$("#gamecontainer").fadeOut("slow", function(){
 						$("#gamecontainer").html('<h1>You finished the game, waiting for it to finish</h1>');
 						$("#gamecontainer").fadeIn("slow");

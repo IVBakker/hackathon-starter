@@ -67,6 +67,9 @@ const challenge = require('./controllers/challenge');
 gameengine = challenge.setIo(socketIo, sessionStore);
 const competitionController = challenge.controller;
 const adminController = require('./controllers/admin')(socketIo,gameengine);
+const gamecreate = require('./controllers/games');
+gamecreate.setIo(socketIo, sessionStore);
+const gamecreateController = gamecreate.gamecreate;
   
 /**
  * Express configuration.
@@ -133,6 +136,7 @@ app.get('/admin', passportConfig.isAdmin, adminController.index);
 app.get('/admin/test', passportConfig.isAdmin, adminController.test);
 app.post('/admin/control', passportConfig.isAdmin, adminController.control);
 app.get('/competition', passportConfig.isAuthenticated, competitionController);
+app.get('/gamecreate', passportConfig.isAuthenticated, gamecreateController);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.logout);

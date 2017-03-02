@@ -1,0 +1,32 @@
+extends layout
+
+block content
+	.row#gamecontainer
+		each game in games
+			.col-md-2
+				button.btn-default.game-create(codename=`${game.prototype.codename}`) !{game.prototype.name}
+
+block footer
+		.container
+		#chat_window_1.row.chat-window.col-xs-5.col-md-3(style='margin-left:10px;')
+				.col-xs-12.col-md-12
+				.panel.panel-default
+					.panel-heading.top-bar
+						.col-md-8.col-xs-8
+								h3.panel-title
+								Chat
+						.col-md-4.col-xs-4(style='text-align: right;')
+								a(href='#')
+								span#minim_chat_window.glyphicon-minus.minim_chat
+						.panel-body.msg_container_base
+						// msg here
+						.panel-footer
+						.input-group
+							input#chat-input.form-control.input-sm.chat-input(type='text', placeholder='Write your message here...')
+							span.input-group-btn
+								button#chat-btn.btn.btn-primary.btn-sm.chat-btn Send
+
+block scripts
+	link(rel='stylesheet', href='/css/chat.css')
+	script(src='/js/lib/socket.io-1.4.5.js')
+	script(src='/js/sandboxio.js')

@@ -1,12 +1,13 @@
 var util = require('util');
 var fs = require('fs');
 var pug = require('pug');
+var escape = require('escape-html');
 var Action = require('../models/UserAction');
 var GameScore = require('../models/GameScore');
+var passportSocketIo = require("passport.socketio");
+var GAMES = {};
 
 var GameBase = function() {
-	this.name = "Undefined";
-	this.codename = "Undefined";
 	this.players = [];
 	this.duration = 1000*5*60;
 	this.started = false;
@@ -18,6 +19,7 @@ var GameBase = function() {
 
 GameBase.prototype.start = function() {
 	this.started = true;
+	this.final_score = null;
 	this.start_time = new Date();
 	return this.duration;
 };
@@ -88,18 +90,22 @@ GameBase.prototype.getJS = function(){
 	var rule_view = 'views/games/'+this.codename+'/game.js';
 	return fs.readFileSync(rule_view).toString();
 };
-
-
+function InheritGame(childGame)
+{
+	util.inherits(childGame, GameBase);
+	console.log("Registering Game", childGame.prototype.codename);
+	GAMES[childGame.prototype.codename] = childGame;
+}
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 var PressGame = function() {
 	GameBase.call(this);
-	this.name = "Click, Click, Click";
-	this.codename = "clickclick";
 	this.duration = 1000*60;
 };
+PressGame.prototype.name = "Click, Click, Click";
+PressGame.prototype.codename = "clickclick";
 
-util.inherits(PressGame, GameBase);
+InheritGame(PressGame, GameBase);
 
 PressGame.prototype.getStartData = function(){
 	return 0;
@@ -144,12 +150,12 @@ exports.PressGame = PressGame;
 
 var MathGame = function() {
 	GameBase.call(this);
-	this.name = "1+1? 11?";
-	this.codename = "maths";
 	this.duration = 2000*60;
 };
+MathGame.prototype.name = "1+1? 11?";
+MathGame.prototype.codename = "maths";
 
-util.inherits(MathGame, GameBase);
+InheritGame(MathGame, GameBase);
 
 MathGame.prototype.getStartData = function(){
 	return {
@@ -213,12 +219,13 @@ exports.MathGame = MathGame;
 
 var GeoGame = function() {
 	GameBase.call(this);
-	this.name = "Where is Wally?";
-	this.codename = "geo";
 	this.duration = 5000*60;
 };
 
-util.inherits(GeoGame, GameBase);
+GeoGame.prototype.name = "Where is Wally?";
+GeoGame.prototype.codename = "geo";
+
+InheritGame(GeoGame, GameBase);
 
 GeoGame.prototype.getStartData = function(){
 	return {
@@ -280,12 +287,12 @@ exports.GeoGame = GeoGame;
 
 var MazeGame = function() {
 	GameBase.call(this);
-	this.name = "Left or Right?";
-	this.codename = "leftright";
 	this.duration = 1000*60;
 };
+MazeGame.prototype.name = "Left or Right?";
+MazeGame.prototype.codename = "leftright";
 
-util.inherits(MazeGame, GameBase);
+InheritGame(MazeGame, GameBase);
 
 MazeGame.prototype.getStartData = function(){
 	return {
@@ -343,12 +350,13 @@ exports.MazeGame = MazeGame;
 
 var LoremGame = function() {
 	GameBase.call(this);
-	this.name = "Lady fingers";
-	this.codename = "lorem";
 	this.duration = 2000*60;
 };
 
-util.inherits(LoremGame, GameBase);
+LoremGame.prototype.name = "Lady fingers";
+LoremGame.prototype.codename = "lorem";
+
+InheritGame(LoremGame, GameBase);
 
 LoremGame.prototype.getStartData = function(){
 	return {
@@ -405,12 +413,12 @@ exports.LoremGame = LoremGame;
 
 var DanceGame = function() {
 	GameBase.call(this);
-	this.name = "Dance Dance Revolution";
-	this.codename = "dance";
 	this.duration = 2000*60;
 };
 
-util.inherits(DanceGame, GameBase);
+DanceGame.prototype.name = "Dance Dance Revolution";
+DanceGame.prototype.codename = "dance";
+InheritGame(DanceGame, GameBase);
 
 DanceGame.prototype.getStartData = function(){
 	return {
@@ -467,12 +475,12 @@ exports.DanceGame = DanceGame;
 
 var TimerGame = function() {
 	GameBase.call(this);
-	this.name = "Time me";
-	this.codename = "timer";
 	this.duration = 3000*60;
 };
 
-util.inherits(TimerGame, GameBase);
+TimerGame.prototype.name = "Time me";
+TimerGame.prototype.codename = "timer";
+InheritGame(TimerGame, GameBase);
 
 TimerGame.prototype.getStartData = function(){
 	return {
@@ -542,12 +550,12 @@ exports.TimerGame = TimerGame;
 
 var CircleGame = function() {
 	GameBase.call(this);
-	this.name = "Circle line";
-	this.codename = "circles";
 	this.duration = 2000*60;
 };
 
-util.inherits(CircleGame, GameBase);
+CircleGame.prototype.name = "Circle line";
+CircleGame.prototype.codename = "circles";
+InheritGame(CircleGame, GameBase);
 
 CircleGame.prototype.getStartData = function(){
 	return {
@@ -602,12 +610,12 @@ exports.CircleGame = CircleGame;
 
 var ClimbingGame = function() {
 	GameBase.call(this);
-	this.name = "Reach for the top";
-	this.codename = "climbing";
 	this.duration = 5000*60;
 };
 
-util.inherits(ClimbingGame, GameBase);
+ClimbingGame.prototype.name = "Reach for the top";
+ClimbingGame.prototype.codename = "climbing";
+InheritGame(ClimbingGame, GameBase);
 
 ClimbingGame.prototype.getStartData = function(){
 	return {
@@ -673,12 +681,12 @@ exports.ClimbingGame = ClimbingGame;
 
 var ReactionGame = function() {
 	GameBase.call(this);
-	this.name = "Boo";
-	this.codename = "reaction";
 	this.duration = 3000*60;
 };
 
-util.inherits(ReactionGame, GameBase);
+ReactionGame.prototype.name = "Boo";
+ReactionGame.prototype.codename = "reaction";
+InheritGame(ReactionGame, GameBase);
 
 ReactionGame.prototype.getStartData = function(){
 	return {
@@ -738,3 +746,131 @@ ReactionGame.prototype.stop = function() {
 };
 
 exports.ReactionGame = ReactionGame;
+
+var getPlayedGames = function(callback)
+{
+	if (callback)
+	{
+		GameScore.find({},{codename:1},{},function(err, codenames)
+		{
+			callback(codenames.map(function(c){return c['codename'];}));
+		});
+	}
+
+};
+exports.getPlayedGames = getPlayedGames;
+
+
+exports.gamecreate = function(req, res, next)
+{
+	getPlayedGames(function(codenames){
+			//req.user
+			
+			res.render('gamecreate', {
+				title: 'Game Sandbox',
+				games: codenames.map(function(c){return GAMES[c];})
+			});
+	});
+};
+
+var RUNNINGGAMES = [];
+var setIo = function(socketIo, sessionstore)
+{
+	var nsp = socketIo.of('/sandbox');
+	
+	nsp.use(passportSocketIo.authorize({
+			secret: process.env.SESSION_SECRET, // the session_secret to parse the cookie
+			store: sessionstore, // we NEED to use a sessionstore. no memorystore please
+			success: onAuthorizeSuccess, // *optional* callback on success - read more below
+			fail: onAuthorizeFail // *optional* callback on fail/error - read more below
+		}));
+		
+	nsp.on('connection', function(socket){
+		socket.on('chat message', function(msg)
+		{
+			socket.broadcast.emit('chat message', {'user':escape(socket.request.user.username),'pic':escape(socket.request.user.picture),'msg':escape(msg)});
+		});
+		socket.on('create',function(codename){
+			if(RUNNINGGAMES[socket.request.user.email] === undefined)
+			{
+				getPlayedGames(function(games){
+					if(GAMES[codename] !== undefined && RUNNINGGAMES[socket.request.user.email] === undefined)
+					{
+						var game = new GAMES[codename]();
+						RUNNINGGAMES[socket.request.user.email] = game;
+						socket.emit('state',{
+							state:'PREPARE',
+							gameowner: socket.request.user.email,
+							html:'<button class="btn-default game-start">START</button>',
+							js:"$('.game-start').click(function(){socket.emit('start');});"
+							});
+					}
+				});
+			}
+		});
+		socket.on('start',function()
+		{
+			console.log("Received Start");
+			if(RUNNINGGAMES[socket.request.user.email] !== undefined)
+			{
+				var email = socket.request.user.email;
+				var g = RUNNINGGAMES[email];
+				console.log("SANDBOX Starting ",g.name);
+				g.start();
+				socket.emit('state',{
+							state:'PLAY',
+							html:g.getHTML(),
+							js:g.getJS()
+							});
+				setTimeout(function(){
+					if(socket && RUNNINGGAMES[email] !== undefined)
+					{
+						g.stop();
+						socket.emit('state',{
+							state:'END',
+							html:'<h1>THE END</h1>',
+							js:''
+							});
+					}
+					
+				}, g.duration);
+			}
+		});
+		
+		socket.on('input',function(input)
+		{
+			var email = socket.request.user.email;
+			console.log(email, "INPUT", input);
+			var g = RUNNINGGAMES[email];
+			if( g !== undefined && g.started)
+			{
+				var answer = g.handle(email, input);
+				console.log(email, 'INPUT:', input, 'ANSWER:', answer);
+				if (['C','E','F'].indexOf(answer[0]) !== -1)
+				{
+					socket.emit('answer', answer);
+				}
+			}
+		});
+		socket.on('disconnect', function() {
+			console.log('Disconnection from ', socket.request.user.email);
+			if(RUNNINGGAMES[socket.request.user.email] !== undefined)
+				delete RUNNINGGAMES[socket.request.user.email];
+   });
+	});
+};
+
+exports.setIo = setIo;
+
+function onAuthorizeSuccess(data, accept){
+	accept();
+}
+
+function onAuthorizeFail(data, message, error, accept){
+	if(error)
+		throw new Error(message);
+	console.log('Failed IO connection:', message);
+
+	if(error)
+		accept(new Error(message));
+}
