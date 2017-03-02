@@ -112,6 +112,10 @@ $(document).ready(function()
 			console.log('CREATE', $(this).attr('codename'));
 			socket.emit('create', $(this).attr('codename'));
 		});
+		$('.game-join').click(function(){
+			console.log('JOIN', $(this).attr('gameid'));
+			socket.emit('join', $(this).attr('gameid'));
+		});
 		
 		function sendInput(input)
 		{

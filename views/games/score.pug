@@ -16,15 +16,5 @@ include countdown
 						td= user.score
 
 if engine.lastgamescores !== null
-	.row
-		h1 Last Game Score: !{engine.lastgamescores.name}
-		table.table.table-condensed
-			thead
-				tr
-					th Email
-					th Game Score
-			tbody
-					each user in engine.lastgamescores.scores
-							tr
-								td= user.email
-								td= user.score
+	- var gamescores = engine.lastgamescores
+	include gamescore

@@ -10,6 +10,7 @@ onAnswer = function(status, height)
 };
 
 $(document).keydown(function(e){
+		e.preventDefault();
     if (e.keyCode === 37 || e.keyCode === 39)
 		{
 			var map_arrow = {

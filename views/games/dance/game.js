@@ -12,6 +12,7 @@ onAnswer = function(status, problem)
 };
 
 $(document).keydown(function(e){
+		e.preventDefault();
     if (e.keyCode > 36 && e.keyCode < 41)
 		{
 			var map_arrow = {

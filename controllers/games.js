@@ -29,7 +29,7 @@ GameBase.prototype.stop = function() {
 	this.played = true;
 };
 
-GameBase.prototype.save = function()
+GameBase.prototype.getfinalscore = function()
 {
 	if(this.played && this.final_score !== null)
 	{
@@ -37,11 +37,21 @@ GameBase.prototype.save = function()
 		gamescore.name = this.name;
 		gamescore.codename = this.codename;
 		gamescore.scores = this.final_score;
-		gamescore.save();
 		return gamescore;
 	}
 	return null;
 };
+
+GameBase.prototype.save = function()
+{
+	var gamescore = this.getfinalscore();
+	if(gamescore !== null)
+	{
+		gamescore.save();
+	}
+	return gamescore;
+};
+
 
 
 GameBase.prototype.getStartData = function(){
@@ -543,7 +553,7 @@ TimerGame.prototype.stop = function() {
 	this.final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['best_timing']};
 	});
-	this.final_score.forEach(function(s){s['score']=s['score'].toString().slice(0,-3)+','+s['score'].toString().slice(-3);});
+	this.final_score.forEach(function(s){s['score']=s['score'].toString().slice(0,-3)+'.'+s['score'].toString().slice(-3);});
 };
 
 exports.TimerGame = TimerGame;
@@ -674,7 +684,7 @@ ClimbingGame.prototype.stop = function() {
 	this.final_score =  this.players.map(function(p){
 		return {email: p.email, score: p.data['time']};
 	});
-	this.final_score.forEach(function(s){s['score']=s['score'].toString().slice(0,-3)+','+s['score'].toString().slice(-3);});
+	this.final_score.forEach(function(s){s['score']=s['score'].toString().slice(0,-3)+'.'+s['score'].toString().slice(-3);});
 };
 
 exports.ClimbingGame = ClimbingGame;
@@ -761,19 +771,21 @@ var getPlayedGames = function(callback)
 exports.getPlayedGames = getPlayedGames;
 
 
+var RUNNINGGAMES = {};
+var RI = 0;
+
 exports.gamecreate = function(req, res, next)
 {
 	getPlayedGames(function(codenames){
 			//req.user
-			
 			res.render('gamecreate', {
 				title: 'Game Sandbox',
-				games: codenames.map(function(c){return GAMES[c];})
+				games: codenames.map(function(c){return GAMES[c];}),
+				runninggames: RUNNINGGAMES
 			});
 	});
 };
 
-var RUNNINGGAMES = [];
 var setIo = function(socketIo, sessionstore)
 {
 	var nsp = socketIo.of('/sandbox');
@@ -791,16 +803,22 @@ var setIo = function(socketIo, sessionstore)
 			socket.broadcast.emit('chat message', {'user':escape(socket.request.user.username),'pic':escape(socket.request.user.picture),'msg':escape(msg)});
 		});
 		socket.on('create',function(codename){
-			if(RUNNINGGAMES[socket.request.user.email] === undefined)
+			var email = socket.request.user.email;
+			if(socket.gameid === undefined)
 			{
 				getPlayedGames(function(games){
-					if(GAMES[codename] !== undefined && RUNNINGGAMES[socket.request.user.email] === undefined)
+					if(GAMES[codename] !== undefined && socket.gameid === undefined)
 					{
 						var game = new GAMES[codename]();
-						RUNNINGGAMES[socket.request.user.email] = game;
+						var gameid = RI;
+						RI++;
+						RUNNINGGAMES[gameid]= {
+							game: game,
+							players: [socket]
+						};
+						socket.gameid = gameid;
 						socket.emit('state',{
 							state:'PREPARE',
-							gameowner: socket.request.user.email,
 							html:'<button class="btn-default game-start">START</button>',
 							js:"$('.game-start').click(function(){socket.emit('start');});"
 							});
@@ -808,30 +826,61 @@ var setIo = function(socketIo, sessionstore)
 				});
 			}
 		});
+		
+		socket.on('join',function(gameid){
+			var joining_email = socket.request.user.email;
+			if(socket.gameid === undefined)
+			{
+				console.log(joining_email, 'Trying to join');
+				var session_g = RUNNINGGAMES[gameid];
+				if(session_g !== null)
+				{
+					console.log(joining_email, 'joined ', session_g['game'].name);
+					socket.gameid = gameid;
+					session_g['players'].forEach(function(s){
+						console.log(joining_email, 'Telling that joined to ', s.request.user.email);
+						s.emit('chat message', {'user':'System','pic':'glados_chat.png','msg':"Player "+joining_email+" joined the game"});
+					});
+					session_g['players'].push(socket);
+					socket.emit('state',{
+						state:'PREPARE',
+						html:'<button class="btn-default game-start">START</button>',
+						js:"$('.game-start').click(function(){socket.emit('start');});"
+						});
+				}
+			}
+		});
+		
 		socket.on('start',function()
 		{
-			console.log("Received Start");
-			if(RUNNINGGAMES[socket.request.user.email] !== undefined)
+			var email = socket.request.user.email;
+			console.log(email, "Received Start");
+			var gameid = socket.gameid;
+			if(gameid !== undefined)
 			{
-				var email = socket.request.user.email;
-				var g = RUNNINGGAMES[email];
+				var g = RUNNINGGAMES[gameid]['game'];
 				console.log("SANDBOX Starting ",g.name);
 				g.start();
-				socket.emit('state',{
+				RUNNINGGAMES[gameid]['players'].forEach(function(s){
+					s.emit('state',{
 							state:'PLAY',
 							html:g.getHTML(),
 							js:g.getJS()
 							});
+				});
 				setTimeout(function(){
-					if(socket && RUNNINGGAMES[email] !== undefined)
+					g.stop();
+					if (RUNNINGGAMES[gameid] !== undefined)
 					{
-						g.stop();
-						socket.emit('state',{
+						RUNNINGGAMES[gameid]['players'].forEach(function(s){
+							s.emit('state',{
 							state:'END',
-							html:'<h1>THE END</h1>',
+							html:pug.renderFile('views/games/gamescore.pug', {gamescores:g.getfinalscore()}),
 							js:''
 							});
+						});
 					}
+					
 					
 				}, g.duration);
 			}
@@ -841,21 +890,35 @@ var setIo = function(socketIo, sessionstore)
 		{
 			var email = socket.request.user.email;
 			console.log(email, "INPUT", input);
-			var g = RUNNINGGAMES[email];
-			if( g !== undefined && g.started)
+			if(socket.gameid !== undefined)
 			{
-				var answer = g.handle(email, input);
-				console.log(email, 'INPUT:', input, 'ANSWER:', answer);
-				if (['C','E','F'].indexOf(answer[0]) !== -1)
+				var g = RUNNINGGAMES[socket.gameid]['game'];
+				if( g !== undefined && g.started)
 				{
-					socket.emit('answer', answer);
+					var answer = g.handle(email, input);
+					console.log(email, 'INPUT:', input, 'ANSWER:', answer);
+					if (['C','E','F'].indexOf(answer[0]) !== -1)
+					{
+						socket.emit('answer', answer);
+					}
 				}
 			}
+			
 		});
 		socket.on('disconnect', function() {
-			console.log('Disconnection from ', socket.request.user.email);
-			if(RUNNINGGAMES[socket.request.user.email] !== undefined)
-				delete RUNNINGGAMES[socket.request.user.email];
+			var email = socket.request.user.email;
+			console.log('Disconnection from ', email);
+			if(socket.gameid !== undefined)
+			{
+				var session_g = RUNNINGGAMES[socket.gameid];
+				var p_i = session_g['players'].findIndex(function(p){return p.request.user.email === email;});
+				session_g['players'].splice(p_i,1);
+				if(session_g['players'].length === 0)
+				{
+					console.log('Removing game, No more player in ', session_g['game'].name);
+					delete RUNNINGGAMES[socket.gameid];
+				}
+			}
    });
 	});
 };

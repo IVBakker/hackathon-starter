@@ -2,9 +2,16 @@ extends layout
 
 block content
 	.row#gamecontainer
-		each game in games
-			.col-md-2
-				button.btn-default.game-create(codename=`${game.prototype.codename}`) !{game.prototype.name}
+		.row
+			each game in games
+				.col-md-2
+					button.btn-default.game-create(codename=`${game.prototype.codename}`) Create !{game.prototype.name}
+		.row
+			each session_g, gameid in runninggames
+				if !session_g['game'].played
+					.col-md-2
+						- var players = session_g['players'].map(function(s){return s.request.user.email;}).join(' - ');
+						button.btn-default.game-join(gameid=`${gameid}`) Join !{session_g['game'].name} (with !{players})
 
 block footer
 		.container
