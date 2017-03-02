@@ -5,6 +5,11 @@ $(document).ready(function()
 		var socket_url = location.protocol + '//' + location.hostname + ':' + location.port+'/sandbox';
 		console.log("SOCKET", socket_url);
 		socket = io(socket_url);
+		function escapeHtml(str) {
+				var div = document.createElement('div');
+				div.appendChild(document.createTextNode(str));
+				return div.innerHTML;
+		}
 		function sendMessage()
 		{
 				var msg = $('#chat-input').val().trim();
