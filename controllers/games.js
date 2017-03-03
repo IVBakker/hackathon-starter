@@ -258,7 +258,10 @@ GeoGame.prototype.handle = function(email, input){
 		{
 			 p['data']['score'] += 1;
 			 p['data']['locations'].shift();
-			 return ['C', p['data']['locations'][0][0]]; //Continue
+			 if( p['data']['locations'].length > 0)
+				 return ['C', p['data']['locations'][0][0]]; //Continue
+			else
+				return ['E', -1]; //Ended
 		}
 		else
 		{
@@ -833,7 +836,7 @@ var setIo = function(socketIo, sessionstore)
 			{
 				console.log(joining_email, 'Trying to join');
 				var session_g = RUNNINGGAMES[gameid];
-				if(session_g !== null)
+				if(session_g !== undefined)
 				{
 					console.log(joining_email, 'joined ', session_g['game'].name);
 					socket.gameid = gameid;

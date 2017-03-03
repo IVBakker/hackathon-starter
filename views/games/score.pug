@@ -7,6 +7,7 @@ include countdown
 				th Email
 				th User
 				th Score
+				th Games Played
 		tbody
 			each user in engine.scoreboard
 				if user.score > 0
@@ -14,6 +15,7 @@ include countdown
 						td= user.email
 						td= user.username
 						td= user.score
+						td= user.scores.length
 
 if engine.lastgamescores !== null
 	- var gamescores = engine.lastgamescores
